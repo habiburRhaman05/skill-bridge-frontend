@@ -1,15 +1,17 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
-import { Command, Search, Menu, User2 } from "lucide-react";
+import { Command, Search, Menu, User2, Loader } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import ToggleTheme from "../shared/toggleTheme";
 import { cn } from "@/lib/utils";
+import { useAuthHandlers } from "@/features/auth/auth-handler";
+import ProfileAvater from "@/features/auth/components/ProfileAvater";
 
 const navLinks = [
   { id: 1, name: "Find Tutors", path: "/tutors" },
@@ -22,6 +24,8 @@ export default function Header() {
   const [hoveredPath, setHoveredPath] = useState<string | null>(null);
 
   const isDashboard = currentPath.startsWith("/dashboard") || currentPath.startsWith("/admin/dashboard");
+const {userLoading,userData} = useAuthHandlers();
+
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-zinc-200/50 bg-white/70 backdrop-blur-xl dark:border-zinc-800/50 dark:bg-zinc-950/70">
@@ -93,7 +97,7 @@ export default function Header() {
   <div className="h-6 w-[1px] bg-zinc-200 dark:bg-zinc-800 mx-1 hidden sm:block" />
 
   {/* Modern Sign In Button */}
-  <Link href="/sign-in">
+  {userLoading ? <Loader className="animate-spin text-xl m-2"/> :userData ? <ProfileAvater user={userData}/> :  <Link href="/sign-in">
     <Button 
     asChild
       variant="outline" 
@@ -105,7 +109,8 @@ export default function Header() {
         <span className="opacity-50 group-hover:translate-x-1 transition-transform duration-300">→</span>
       </span>
     </Button>
-  </Link>
+  </Link> }
+ 
 
   {/* Mobile Search/Menu */}
   <Button variant="ghost" size="icon" className="md:hidden">

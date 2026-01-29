@@ -35,7 +35,7 @@ const ProfileAvater = ({user}:{user:any}) => {
       <DropdownMenuTrigger asChild>
         <button className="outline-none ml-2">
           <Avatar className="h-9 w-9 border-2 border-transparent hover:border-indigo-500 transition-all cursor-pointer shadow-sm">
-            <AvatarImage src={user.image} alt={user.name} />
+            <AvatarImage src={user.profileAvater} alt={user.name} />
             <AvatarFallback className="bg-indigo-100 text-indigo-700 font-bold">
               {user.name?.charAt(0) || "U"}
             </AvatarFallback>
