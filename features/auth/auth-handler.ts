@@ -1,46 +1,57 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 import { signInPayloadType, signUpPayloadType } from "@/features/auth/types";
+import { useApiMutation } from "@/hooks/useApiMutation";
 
-// লোডিং স্টেটকে আরও সুনির্দিষ্ট করার জন্য টাইপ
-type AuthStatus = "idle" | "signing-in" | "signing-up";
 
 export const useAuthHandlers = () => {
   const router = useRouter();
-  const [status, setStatus] = useState<AuthStatus>("idle");
 
+  
+
+  const signupMutation = useApiMutation({
+    endpoint:"/api/auth/register",
+    method:"POST",
+  })
+  const signinMutation = useApiMutation({
+    endpoint:"/api/auth/login",
+    method:"POST",
+  })
   // --- Sign In ---
   const signIn = async (data: signInPayloadType) => {
-    setStatus("signing-in");
-    try {
-    //  login logic
-    
-    } catch (error) {
-      setStatus("idle");
-      toast.error("Network error. Please try again.");
-    }
+ 
+    const userData =  await signinMutation.mutateAsync(data);
+return userData.user
+
   };
 
   // --- Sign Up ---
   const signUp = async (data: signUpPayloadType) => {
-    setStatus("signing-up");
-    try {
-      // signup logic
-    } catch (error) {
-      setStatus("idle");
-      toast.error("An unexpected error occurred");
-    }
+ 
+  
+    await signupMutation.mutateAsync(data);
+ 
+   
+   
   };
+useEffect(()=>{
+    if(signupMutation.isSuccess){
+      router.push("/sign-in")
+     }
+    if(signinMutation.isSuccess){
+      router.push("/dashboard")
+     }
+},[signupMutation.isSuccess,signinMutation.isSuccess])
 
   return {
     signIn,
     signUp,
-    isSigningIn: status === "signing-in",
-    isSigningUp: status === "signing-up",
+    isSigningIn: false,
+    isSigningUp: signupMutation.isPending,
 
   };
 };

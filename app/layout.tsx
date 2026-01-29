@@ -39,7 +39,7 @@ export default function RootLayout({
       >
         <QueryProvider>
           <SidebarProvider>
-             <Toaster richColors/>
+             <Toaster richColors position="top-center" />
               {children}
           </SidebarProvider>
         </QueryProvider>
