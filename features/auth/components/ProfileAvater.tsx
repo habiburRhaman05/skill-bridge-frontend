@@ -1,11 +1,11 @@
-"use client"
-import Link from 'next/link';
-import { 
-  Settings, 
-  User, 
+
+import {
   CreditCard,
-  KeyRound // Added for password/account settings
+  Settings,
+  User,
+  User2
 } from 'lucide-react';
+import Link from 'next/link';
 
 import {
   DropdownMenu,
@@ -23,13 +23,23 @@ import LogoutButton from './logoutButton';
 
 
 const ProfileAvater = ({user}:{user:any}) => {
-    
+ 
   return (
  <>
- {!user ? (
-    <Link href="/sign-in" >
-      <Button className='cursor-pointer'>Login</Button>
-    </Link>
+ {true ? (
+   <Link href="/sign-in">
+    <Button 
+    asChild
+      variant="outline" 
+      className="group relative h-9 px-5 rounded-full border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-all duration-300"
+    >
+      <span className="relative z-10 flex items-center gap-2 text-sm font-medium">
+     <User2/>
+        Sign In
+        <span className="opacity-50 group-hover:translate-x-1 transition-transform duration-300">→</span>
+      </span>
+    </Button>
+  </Link> 
   ) : (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -86,7 +96,7 @@ const ProfileAvater = ({user}:{user:any}) => {
            <LogoutButton />
         </DropdownMenuItem>
       </DropdownMenuContent>
-    </DropdownMenu>
+    </DropdownMenu> 
   )}
  </>
   )

@@ -16,7 +16,7 @@ const signInSchema = z.object({
 
 
 export default function SignInForm() {
-
+const router = useRouter()
   const { signIn } = useAuthHandlers();
 
   // --- TanStack Form Logic ---
@@ -29,7 +29,16 @@ export default function SignInForm() {
       onChange: signInSchema,
     },
     onSubmit: async ({ value }) => {
-      await signIn(value);
+     const user = await signIn(value);
+       if(user && user.role === "TUTOR"){
+      router.push("/tutor/dashboard")
+     }else if(user && user.role === "STUDENT"){
+      router.push("/dashboard")
+     }else{
+      router.push("/admin")
+     }
+     
+     
     },
   });
 

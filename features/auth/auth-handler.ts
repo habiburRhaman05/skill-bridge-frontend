@@ -46,11 +46,13 @@ return userData.user
  
   setStatus("get-profile")
      const {user} = await getProfile();
-     console.log(user);
-     
-     setUserData(user?.error ? null : user.data)
- setStatus("none")
-   
+    
+
+   if(!user){
+     setStatus("none")
+     setUserData({})
+   }
+   setUserData(user)
    
   };
   // --- Get user profile ---
@@ -74,10 +76,8 @@ useEffect(()=>{
     if(signupMutation.isSuccess){
       router.push("/sign-in")
      }
-    if(signinMutation.isSuccess){
-      router.push("/dashboard")
-     }
-},[signupMutation.isSuccess,signinMutation.isSuccess])
+ 
+},[signupMutation.isSuccess])
 
   return {
     signIn,

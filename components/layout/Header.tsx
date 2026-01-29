@@ -1,16 +1,22 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Command, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { motion } from "framer-motion";
-import { Command, Search, Menu, User2, Loader } from "lucide-react";
+import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import ToggleTheme from "../shared/toggleTheme";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
-import { useAuthHandlers } from "@/features/auth/auth-handler";
+import ToggleTheme from "../shared/toggleTheme";
 import ProfileAvater from "@/features/auth/components/ProfileAvater";
 
 const navLinks = [
@@ -22,18 +28,19 @@ const navLinks = [
 export default function Header() {
   const currentPath = usePathname();
   const [hoveredPath, setHoveredPath] = useState<string | null>(null);
-
-  const isDashboard = currentPath.startsWith("/dashboard") || currentPath.startsWith("/admin/dashboard");
-const {userLoading,userData} = useAuthHandlers();
+  const [isOpen, setIsOpen] = useState(false);
 
 
+    
+    const isSideTrgiggerShow =   currentPath.includes("/dashboard") || currentPath.includes("/tutor/dashboard") || currentPath.includes("/admin")
+  
   return (
     <header className="sticky top-0 z-50 w-full border-b border-zinc-200/50 bg-white/70 backdrop-blur-xl dark:border-zinc-800/50 dark:bg-zinc-950/70">
-      <div className=" max-w-7xl mx-auto flex h-16 items-center justify-between px-4">
+      <div className="max-w-7xl mx-auto flex h-16 items-center justify-between px-4">
         
         {/* Left Side: Logo & Sidebar Toggle */}
         <div className="flex items-center gap-4">
-          {isDashboard && (
+          {isSideTrgiggerShow && (
             <SidebarTrigger className="h-9 w-9 text-zinc-600 transition-colors hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-900" />
           )}
           
@@ -41,13 +48,13 @@ const {userLoading,userData} = useAuthHandlers();
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-600 text-white shadow-lg shadow-indigo-500/20">
               <Command className="h-5 w-5" />
             </div>
-            <span className="hidden text-lg font-bold tracking-tight sm:block">
+            <span className="text-lg font-bold tracking-tight">
               SkillBridge
             </span>
           </Link>
         </div>
 
-        {/* Center: Navigation Links */}
+        {/* Center: Desktop Navigation */}
         <nav 
           className="hidden md:flex items-center gap-1"
           onMouseLeave={() => setHoveredPath(null)}
@@ -65,17 +72,17 @@ const {userLoading,userData} = useAuthHandlers();
                 )}
               >
                 {link.name}
-                {/* Modern Hover Pill Effect */}
-                {hoveredPath === link.path && (
-                  <motion.div
-                    layoutId="nav-hover"
-                    className="absolute inset-0 -z-10 rounded-lg bg-zinc-100 dark:bg-zinc-900"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                  />
-                )}
-                {/* Active Underline */}
+                <AnimatePresence>
+                  {hoveredPath === link.path && (
+                    <motion.div
+                      layoutId="nav-hover"
+                      className="absolute inset-0 -z-10 rounded-lg bg-zinc-100 dark:bg-zinc-900"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                    />
+                  )}
+                </AnimatePresence>
                 {isActive && (
                   <motion.div
                     layoutId="nav-active"
@@ -87,36 +94,58 @@ const {userLoading,userData} = useAuthHandlers();
           })}
         </nav>
 
-     {/* Right Side Actions */}
-<div className="flex items-center justify-end gap-2">
-  <div className="hidden items-center sm:flex">
-  
-    <ToggleTheme />
-  </div>
+        {/* Right Side Actions */}
+        <div className="flex items-center gap-2">
+          <div className="hidden sm:flex items-center">
+            <ToggleTheme />
+          </div>
 
-  <div className="h-6 w-[1px] bg-zinc-200 dark:bg-zinc-800 mx-1 hidden sm:block" />
+          <div className="hidden sm:block h-6 w-[1px] bg-zinc-200 dark:bg-zinc-800 mx-1" />
 
-  {/* Modern Sign In Button */}
-  {userLoading ? <Loader className="animate-spin text-xl m-2"/> :userData ? <ProfileAvater user={userData}/> :  <Link href="/sign-in">
-    <Button 
-    asChild
-      variant="outline" 
-      className="group relative h-9 px-5 rounded-full border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-all duration-300"
-    >
-      <span className="relative z-10 flex items-center gap-2 text-sm font-medium">
-     <User2/>
-        Sign In
-        <span className="opacity-50 group-hover:translate-x-1 transition-transform duration-300">→</span>
-      </span>
-    </Button>
-  </Link> }
- 
+          <ProfileAvater user={null} />
 
-  {/* Mobile Search/Menu */}
-  <Button variant="ghost" size="icon" className="md:hidden">
-    <Menu className="h-5 w-5" />
-  </Button>
-</div>
+          {/* Mobile Menu Drawer */}
+          <div className="md:hidden">
+            <Sheet open={isOpen} onOpenChange={setIsOpen}>
+              {!isSideTrgiggerShow && <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="hover:bg-zinc-100 dark:hover:bg-zinc-900">
+                  <Menu className="h-5 w-5" />
+                </Button>
+              </SheetTrigger>}
+              <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+                <SheetHeader className="text-left">
+                  <SheetTitle className="flex items-center gap-2">
+                    <Command className="h-5 w-5 text-indigo-600" />
+                    SkillBridge
+                  </SheetTitle>
+                </SheetHeader>
+                <div className="mt-8 flex flex-col gap-4">
+                  {navLinks.map((link) => (
+                    <Link
+                      key={link.id}
+                      href={link.path}
+                      onClick={() => setIsOpen(false)}
+                      className={cn(
+                        "flex items-center rounded-lg px-4 py-3 text-sm font-medium transition-colors",
+                        currentPath === link.path 
+                          ? "bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-400" 
+                          : "text-zinc-600 hover:bg-zinc-50 dark:text-zinc-400 dark:hover:bg-zinc-900"
+                      )}
+                    >
+                      {link.name}
+                    </Link>
+                  ))}
+                  <div className="mt-4 border-t border-zinc-100 pt-4 dark:border-zinc-800 sm:hidden">
+                    <div className="flex items-center justify-between px-4">
+                      <span className="text-sm text-zinc-500">Theme Mode</span>
+                      <ToggleTheme />
+                    </div>
+                  </div>
+                </div>
+              </SheetContent>
+            </Sheet>
+          </div>
+        </div>
       </div>
     </header>
   );

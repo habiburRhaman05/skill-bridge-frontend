@@ -1,3 +1,5 @@
+import Header from '@/components/layout/Header';
+import { DashboardSidebar } from '@/components/layout/SideBar';
 import { getProfile } from '@/features/auth/services';
 import { redirect } from 'next/navigation';
 import React from 'react'
@@ -11,15 +13,22 @@ const StudentDashboardLayout = async({children}:{
    if(!user || user.error){
     redirect("/sign-in")
    }
-   if(user.role !== "STUDENT"){
+   if(user.data.role !== "STUDENT"){
     redirect("/")
    }
 
   return (
-    <div>
-      
-        {children}
+    <main className='min-w-full max-w-7xl mx-auto'>
+<Header/>
+    <div className='flex'>
+  <DashboardSidebar
+      userRole={user.data.role}
+      />
+        <div className='p-4'>
+          {children}
+        </div>
     </div>
+    </main>
   )
 }
 
