@@ -1,9 +1,9 @@
 import React from 'react'
 
-const BrowseTutorsPage = () => {
+const Tutors = () => {
   return (
-    <div>BrowseTutorsPage</div>
+    <div>Tutors</div>
   )
 }
 
-export default BrowseTutorsPage
+export default Tutors

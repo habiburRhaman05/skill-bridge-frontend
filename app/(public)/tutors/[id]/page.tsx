@@ -1,9 +1,8 @@
-import React from 'react'
 
-const TutorProfilePublic = () => {
+
+
+export default function TutorDetailPage() {
   return (
-    <div>TutorProfilePublic</div>
-  )
+   <div>tutor profile</div> 
+  );
 }
-
-export default TutorProfilePublic
