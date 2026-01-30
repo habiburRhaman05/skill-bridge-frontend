@@ -1,8 +1,9 @@
+import React from 'react'
 
-
-
-export default function TutorDetailPage() {
+const page = () => {
   return (
-   <div>tutor profile</div> 
-  );
+    <div>page</div>
+  )
 }
+
+export default page

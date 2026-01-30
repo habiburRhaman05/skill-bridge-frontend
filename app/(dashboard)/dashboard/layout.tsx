@@ -25,7 +25,7 @@ console.log("user",user);
   <DashboardSidebar
       userRole={user.data.role}
       />
-        <div className='p-4 w-full'>
+        <div className=' w-full'>
           {children}
         </div>
     </div>

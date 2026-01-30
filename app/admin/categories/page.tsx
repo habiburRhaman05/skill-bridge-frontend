@@ -1,9 +1,9 @@
 import React from 'react'
 
-const ManageCategoryPage = () => {
+const page = () => {
   return (
-    <div>ManageCategoryPage</div>
+    <div>page</div>
   )
 }
 
-export default ManageCategoryPage
+export default page

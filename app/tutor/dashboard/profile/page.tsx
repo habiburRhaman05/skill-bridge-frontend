@@ -1,9 +1,15 @@
+import { getProfile } from '@/features/auth/services'
+import TutorProfilePage from '@/features/tutor/components/ProfileDetails';
 import React from 'react'
 
-const TutorProfile = () => {
+const TutorDashboardProfile = async () => {
+  const {user } = await getProfile();
+
   return (
-    <div>TutorProfile</div>
+    <div>
+      <TutorProfilePage tutor={user.data}/>
+    </div>
   )
 }
 
-export default TutorProfile
+export default TutorDashboardProfile

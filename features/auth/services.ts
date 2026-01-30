@@ -11,7 +11,7 @@ export const getProfile = async ()=>{
             headers:{
                 "Authorization":`Bearer ${token?.value}`
             },
-            next:{revalidate:60}
+            cache:"no-cache"
 
         });
         const data = await res.json();

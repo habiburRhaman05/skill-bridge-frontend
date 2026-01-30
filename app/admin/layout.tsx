@@ -1,12 +1,9 @@
 import React from 'react'
 
-const AdminDashbaordLayout = ({children}:{children:React.ReactNode}) => {
+const layout = () => {
   return (
-    <div>AdminDashbaordLayout
-
-        {children}
-    </div>
+    <div>layout</div>
   )
 }
 
-export default AdminDashbaordLayout
+export default layout

@@ -42,10 +42,9 @@ const studentItems = [
 const tutorItems = [
   { title: "Overview", href: "/tutor/dashboard", icon: LayoutGrid },
   { title: "My Sessions", href: "/tutor/dashboard/sessions", icon: GraduationCap },
-  { title: "Availability", href: "/tutor/dashboard/availablity", icon: Timer },
+  { title: "Availability", href: "/tutor/dashboard/availability", icon: Timer },
   { title: "My Reviews", href: "/tutor/dashboard/my-reviews", icon: Star },
   { title: "Profile", href: "/tutor/dashboard/profile", icon: User },
-  { title: "Security", href: "/tutor/dashboard/security", icon: Shield },
 ]
 
 const adminItems = [
