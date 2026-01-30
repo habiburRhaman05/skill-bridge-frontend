@@ -1,12 +1,13 @@
 
-import React from 'react'
 
-const StudentDashboardPage = async() => {
+import { getProfile } from "@/features/auth/services";
+import DashboardContent from "@/features/student/components/DashboardContent";
+
+
+export default async function StudentOverview() {
  
-  
-  return (
-    <div>StudentDashboardPageStudent</div>
-  )
+  const {user} = await getProfile();
+
+  return <DashboardContent data={user.data}/>
 }
 
-export default StudentDashboardPage

@@ -8,8 +8,7 @@ const StudentDashboardLayout = async({children}:{
     children:React.ReactNode
 }) => {
    const {user} = await getProfile();
- console.log(user);
- 
+
    if(!user || user.error){
     redirect("/sign-in")
    }
@@ -18,13 +17,13 @@ const StudentDashboardLayout = async({children}:{
    }
 
   return (
-    <main className='min-w-full max-w-7xl mx-auto'>
+    <main className='w-full '>
 <Header/>
-    <div className='flex'>
+    <div className=' w-full flex'>
   <DashboardSidebar
       userRole={user.data.role}
       />
-        <div className='p-4'>
+        <div className='p-4 w-full'>
           {children}
         </div>
     </div>

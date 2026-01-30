@@ -1,61 +1,64 @@
 "use client"
-
 import {
-  DockIcon,
-  LayoutDashboard,
-  Lock,
+  LayoutGrid,
+  Calendar,
+  User,
+  Shield,
+  Search,
+  Timer,
+  Star,
+  Users,
+  Shapes,
   LogOut,
-  Settings,
-  User2,
-  UserCircle
-} from "lucide-react"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
+  GraduationCap,
+  History,
+  Layout
+} from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
-import { Button } from "@/components/ui/button"
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
+  SidebarGroupContent,
   SidebarGroupLabel,
+  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import { cn } from "@/lib/utils"
-
-
-
+import { Button } from "../ui/button"
 
 const studentItems = [
-  { title: "Overview", href: "/dashboard", icon: LayoutDashboard },
-  { title: "My Booking", href: "/dashboard/bookings", icon: DockIcon },
-  { title: "Profile", href: "/dashboard/profile", icon: User2 },
-  { title: "Security", href: "/dashboard/security", icon: Lock },
+  { title: "Overview", href: "/dashboard", icon: LayoutGrid },
+  { title: "My Bookings", href: "/dashboard/bookings", icon: Calendar },
+  { title: "Profile", href: "/dashboard/profile", icon: User },
+  { title: "Security", href: "/dashboard/security", icon: Shield },
 ]
-const commonItems = [
-  { title: "Explore Tutors", href: "/tutors", icon: LayoutDashboard }
-]
-
-
 
 const tutorItems = [
-  { title: "Overview", href: "/tutor/dashboard", icon: LayoutDashboard },
-  { title: "My Sessions", href: "/tutor/dashboard/sessions", icon: DockIcon },
-  { title: "Add Availablity", href: "/tutor/dashboard/availablity", icon: Settings },
-  { title: "My reviews", href: "/tutor/dashboard/my-reviews", icon: Settings },
-  { title: "Profile", href: "/tutor/dashboard/profile", icon: Settings },
-  { title: "Security", href: "/tutor/dashboard/security", icon: Settings },
+  { title: "Overview", href: "/tutor/dashboard", icon: LayoutGrid },
+  { title: "My Sessions", href: "/tutor/dashboard/sessions", icon: GraduationCap },
+  { title: "Availability", href: "/tutor/dashboard/availablity", icon: Timer },
+  { title: "My Reviews", href: "/tutor/dashboard/my-reviews", icon: Star },
+  { title: "Profile", href: "/tutor/dashboard/profile", icon: User },
+  { title: "Security", href: "/tutor/dashboard/security", icon: Shield },
 ]
+
 const adminItems = [
-  { title: "Overview", href: "/admin", icon: UserCircle },
-  { title: "Manage bookings", href: "/admin/bookings", icon: Lock },
-  { title: "Manage categories", href: "/admin/categories", icon: Lock },
-  { title: "All Users", href: "/admin/users", icon: Lock },
-];
+  { title: "Admin Overview", href: "/admin", icon: Layout },
+  { title: "Manage Bookings", href: "/admin/bookings", icon: History },
+  { title: "Categories", href: "/admin/categories", icon: Shapes },
+  { title: "Users List", href: "/admin/users", icon: Users },
+]
 
-
-
+// --- Common Items ---
+const commonItems = [
+  { title: "Explore Tutors", href: "/tutors", icon: Search }
+]
 
 export function DashboardSidebar({userRole}:{userRole:"ADMIN" | "STUDENT" | "TUTOR"}) {
   const pathname = usePathname()
@@ -140,7 +143,7 @@ export function DashboardSidebar({userRole}:{userRole:"ADMIN" | "STUDENT" | "TUT
                     )}
                   >
                     <Link href={item.href}>
-                      <item.icon className="h-[18px] w-[18px]" />
+                      <item.icon className="h-[20px] w-[18px]" />
                       <span className="text-sm font-medium">
                         {item.title}
                       </span>

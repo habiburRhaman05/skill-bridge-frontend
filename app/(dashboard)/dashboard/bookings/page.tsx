@@ -1,9 +1,8 @@
-import React from 'react'
+"use client";
 
-const MyBokings = () => {
-  return (
-    <div>MyBokings</div>
-  )
+import StudentBookings from "@/features/student/components/StudentBookings";
+
+
+export default function Page() {
+  return <StudentBookings />;
 }
-
-export default MyBokings

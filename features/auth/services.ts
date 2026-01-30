@@ -10,7 +10,8 @@ export const getProfile = async ()=>{
             credentials:"include",
             headers:{
                 "Authorization":`Bearer ${token?.value}`
-            }
+            },
+            next:{revalidate:60}
 
         });
         const data = await res.json();
