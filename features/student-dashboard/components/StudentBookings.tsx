@@ -12,7 +12,8 @@ import { Button } from "@/components/ui/button";
 import { BookingCard } from "./BookingCard";
 import { BookingSkeleton } from "./BookingSkeleton";
 import { EmptyState } from "./EmptyState";
-import { Booking } from "./types";
+import { Booking } from "../types";
+
 
 const DUMMY_BOOKINGS: Booking[] = [
   { id: "1", tutorName: "Dr. Sarah Johnson", subject: "Quantum Physics", date: "2026-02-15", time: "10:00 AM", status: "confirmed", avatar: "https://i.pravatar.cc/150?u=1", amount: "$45" },

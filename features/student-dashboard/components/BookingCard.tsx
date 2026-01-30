@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Calendar, Clock, DollarSign, BookOpen, UserCheck, MoreVertical } from 'lucide-react';
 
-export const BookingCard = ({ booking }) => {
+export const BookingCard = ({ booking }:{booking:any}) => {
   const { tutor, dateTime, status, id } = booking;
   const tutorUser = tutor.user;
   
