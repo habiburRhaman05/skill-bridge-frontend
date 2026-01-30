@@ -1,6 +1,7 @@
 
 import {
   CreditCard,
+  Loader2,
   Settings,
   User,
   User2
@@ -21,12 +22,21 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from '@/components/ui/button';
 import LogoutButton from './logoutButton';
 
+type Props = {
+  data:{
+    user:any,
+    isLoading:boolean;
+    isError:boolean;
+  }
+}
 
-const ProfileAvater = ({user}:{user:any}) => {
+const ProfileAvater = ({data}:Props) => {
  
   return (
  <>
- {true ? (
+ {data.isLoading ? <div>
+  <Loader2 className='animate-spin'/>
+ </div> : !data.user || data.isError ? (
    <Link href="/sign-in">
     <Button 
     asChild
@@ -45,9 +55,9 @@ const ProfileAvater = ({user}:{user:any}) => {
       <DropdownMenuTrigger asChild>
         <button className="outline-none ml-2">
           <Avatar className="h-9 w-9 border-2 border-transparent hover:border-indigo-500 transition-all cursor-pointer shadow-sm">
-            <AvatarImage src={user.profileAvater} alt={user.name} />
+            <AvatarImage src={data.user.profileAvater} alt={data.user.name} />
             <AvatarFallback className="bg-indigo-100 text-indigo-700 font-bold">
-              {user.name?.charAt(0) || "U"}
+              {data.user.name?.charAt(0) || "U"}
             </AvatarFallback>
           </Avatar>
         </button>
@@ -56,8 +66,8 @@ const ProfileAvater = ({user}:{user:any}) => {
       <DropdownMenuContent className="w-64 p-2 mt-2" align="end" sideOffset={8}>
         <DropdownMenuLabel className="font-normal p-3">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-bold leading-none text-zinc-900 dark:text-zinc-100">{user.name}</p>
-            <p className="text-xs leading-none text-zinc-500 dark:text-zinc-400 mt-1 italic">{user.email}</p>
+            <p className="text-sm font-bold leading-none text-zinc-900 dark:text-zinc-100">{data.user.name}</p>
+            <p className="text-xs leading-none text-zinc-500 dark:text-zinc-400 mt-1 italic">{data.user.email}</p>
           </div>
         </DropdownMenuLabel>
         
@@ -66,27 +76,12 @@ const ProfileAvater = ({user}:{user:any}) => {
         <DropdownMenuGroup>
           {/* Profile Settings */}
           <DropdownMenuItem asChild className="cursor-pointer py-2.5 rounded-lg focus:bg-indigo-50 dark:focus:bg-indigo-950/30">
-            <Link href="/account/profile" className="flex w-full items-center">
+            <Link href={data.user.role === "ADMIN" ? "/admin" : data.user.role === "TUTOR" ? "/tutor/dashboard" : "/dashboard"} className="flex w-full items-center">
               <User className="mr-3 h-4 w-4 text-zinc-500" />
-              <span className="font-medium">Profile Settings</span>
+              <span className="font-medium">View Dashboard</span>
             </Link>
           </DropdownMenuItem>
 
-          {/* Billing */}
-          <DropdownMenuItem asChild className="cursor-pointer py-2.5 rounded-lg focus:bg-indigo-50 dark:focus:bg-indigo-950/30">
-            <Link href="/account/billing" className="flex w-full items-center">
-              <CreditCard className="mr-3 h-4 w-4 text-zinc-500" />
-              <span className="font-medium">Billing & Plans</span>
-            </Link>
-          </DropdownMenuItem>
-
-          {/* Account/Change Password Settings */}
-          <DropdownMenuItem asChild className="cursor-pointer py-2.5 rounded-lg focus:bg-indigo-50 dark:focus:bg-indigo-950/30">
-            <Link href="/account/settings" className="flex w-full items-center">
-              <Settings className="mr-3 h-4 w-4 text-zinc-500" />
-              <span className="font-medium">Account Settings</span>
-            </Link>
-          </DropdownMenuItem>
         </DropdownMenuGroup>
 
         <DropdownMenuSeparator />

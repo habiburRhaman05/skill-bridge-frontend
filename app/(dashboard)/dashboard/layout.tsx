@@ -8,6 +8,8 @@ const StudentDashboardLayout = async({children}:{
     children:React.ReactNode
 }) => {
    const {user} = await getProfile();
+console.log("user",user);
+
 
    if(!user || user.error){
     redirect("/sign-in")

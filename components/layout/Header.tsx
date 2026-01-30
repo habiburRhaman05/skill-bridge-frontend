@@ -18,6 +18,9 @@ import {
 import { cn } from "@/lib/utils";
 import ToggleTheme from "../shared/toggleTheme";
 import ProfileAvater from "@/features/auth/components/ProfileAvater";
+import { useAuthHandlers } from "@/features/auth/auth-handler";
+import { useQuery } from "@tanstack/react-query";
+import { getProfile } from "@/features/auth/services";
 
 const navLinks = [
   { id: 1, name: "Find Tutors", path: "/tutors" },
@@ -31,6 +34,13 @@ export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
 
 
+const {data,isLoading,isError} = useQuery({
+  queryFn:getProfile,
+  queryKey:["user-profile"]
+})
+
+
+ 
     
     const isSideTrgiggerShow =   currentPath.includes("/dashboard") || currentPath.includes("/tutor/dashboard") || currentPath.includes("/admin")
   
@@ -102,7 +112,12 @@ export default function Header() {
 
           <div className="hidden sm:block h-6 w-[1px] bg-zinc-200 dark:bg-zinc-800 mx-1" />
 
-          <ProfileAvater user={null} />
+          <ProfileAvater data={
+            {
+              user:data?.user.data,
+              isLoading,
+            isError}
+          } />
 
           {/* Mobile Menu Drawer */}
           <div className="md:hidden">

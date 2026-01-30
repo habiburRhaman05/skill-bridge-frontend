@@ -1,6 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, Timer, XCircle } from "lucide-react";
-import { Status } from "./types";
+import { Status } from "../types";
+
 
 export function StatusBadge({ status }: { status: Status }) {
   const map = {

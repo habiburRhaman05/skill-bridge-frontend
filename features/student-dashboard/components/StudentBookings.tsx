@@ -21,7 +21,7 @@ const DUMMY_BOOKINGS: Booking[] = [
   { id: "4", tutorName: "James Wilson", subject: "Web Development", date: "2025-12-05", time: "11:00 AM", status: "cancelled", avatar: "https://i.pravatar.cc/150?u=4", amount: "$50" },
 ];
 
-export default function StudentBookings() {
+export default function StudentBookings({data}:{data:any}) {
   const [isLoading, setIsLoading] = useState(true);
   const [filterStatus, setFilterStatus] = useState("all");
   const [sortOrder, setSortOrder] = useState("latest");
@@ -86,11 +86,12 @@ export default function StudentBookings() {
       <AnimatePresence>
         {isLoading
           ? Array.from({ length: 3 }).map((_, i) => <BookingSkeleton key={i} />)
-          : filtered.length
-          ? filtered.map(b => <BookingCard key={b.id} booking={b} />)
+          : data.length
+          ? data.map((b:any) => <BookingCard key={b.id} booking={b} />)
           : <EmptyState />
         }
       </AnimatePresence>
+  
     </div>
   );
 }

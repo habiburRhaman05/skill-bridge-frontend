@@ -22,7 +22,7 @@ export default function DashboardContent({data}:{data:{name:string}}) {
 name={data.name}
 />
     <Suspense fallback={<StudentStatsSkelection/>}>
-        <StudentStats  />
+        <StudentStats/>
 
     </Suspense>
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
