@@ -127,3 +127,60 @@ export const changePassword = async (data: any) => {
   if (!response.ok) throw new Error(result.message || "Failed to update password");
   return result;
 };
+export const createBooking = async (data: any) => {
+
+   const token = await getToken()
+  const response = await fetch(`${process.env.API_URL}/api/booking`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.message || "Failed to create booking");
+  revalidatePath(`/tutors/${data.tutorId}`)
+  return result;
+};
+export const getBookingDetails = async (bookingId:string) => {
+try {
+   const token = await getToken()
+  const response = await fetch(`${process.env.API_URL}/api/booking/${bookingId}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    }
+  });
+
+  const result = await response.json();
+  // if (!response.ok) throw new Error(result.message || "Failed to fetch booking details");
+  return result;
+} catch (error) {
+  console.log("error",error);
+  
+}
+};
+export const createReview = async (payload:any) => {
+try {
+   const token = await getToken()
+  const response = await fetch(`${process.env.API_URL}/api/review`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+      
+    },
+    body:JSON.stringify(payload)
+  });
+
+  const result = await response.json();
+  // if (!response.ok) throw new Error(result.message || "Failed to fetch booking details");
+  revalidatePath(`/dashboard/bookings/9d703790-1ab6-41a4-bd86-e92e8ca06c43`)
+  return result;
+} catch (error) {
+  console.log("error",error);
+}
+};

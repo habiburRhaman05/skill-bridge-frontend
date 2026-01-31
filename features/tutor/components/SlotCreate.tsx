@@ -51,12 +51,13 @@ export default function CreateAvaliablity() {
     }
     const payload ={
       date,
-      start: TIME_OPTIONS.find(t => t.value === startTime)?.label,
-      end: TIME_OPTIONS.find(t => t.value === endTime)?.label,
+      startTime: TIME_OPTIONS.find(t => t.value === startTime)?.label,
+      endTime: TIME_OPTIONS.find(t => t.value === endTime)?.label,
     }
 
-    await addAvailabilityMutation.mutateAsync(payload)
+    const res = await addAvailabilityMutation.mutateAsync(payload)
     
+console.log(res);
 
   
     setIsModalOpen(false);

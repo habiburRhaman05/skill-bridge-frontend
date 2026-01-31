@@ -49,6 +49,6 @@ const UpCommingSessions = async () => {
 export default UpCommingSessions
 
 export const UpCommingSessionsSkelection = ()=>{
-  return     <Skeleton className="h-64 lg:col-span-4" />
+  return     <Skeleton className="h-64  col-span-4" />
     
 }

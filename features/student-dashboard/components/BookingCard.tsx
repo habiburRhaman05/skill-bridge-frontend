@@ -1,6 +1,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Calendar, Clock, DollarSign, BookOpen, UserCheck, MoreVertical } from 'lucide-react';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 
 export const BookingCard = ({ booking }:{booking:any}) => {
   const { tutor, dateTime, status, id } = booking;
@@ -37,6 +39,8 @@ export const BookingCard = ({ booking }:{booking:any}) => {
       </div>
 
       {/* Tutor Profile Section */}
+      
+      
       <div className="flex items-center gap-4 mb-6">
         <div className="relative">
           <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-2xl font-black text-white shadow-lg">
@@ -61,6 +65,7 @@ export const BookingCard = ({ booking }:{booking:any}) => {
           </p>
         </div>
       </div>
+   
 
       {/* Details Grid */}
       <div className="grid grid-cols-2 gap-4 py-4 border-y border-white/5 mb-6">
@@ -83,11 +88,20 @@ export const BookingCard = ({ booking }:{booking:any}) => {
       {/* Footer / ID */}
       <div className="flex items-center justify-between">
         <span className="text-[10px] font-mono text-slate-600">ID: #{id.split('-')[0]}</span>
-        <button className="bg-white/10 hover:bg-white text-white hover:text-black px-4 py-2 rounded-xl text-sm font-semibold transition-all">
-          Manage Session
-        </button>
+<div className="flex gap-4">
+          <Button asChild className="bg-blue-600 hover:bg-white text-white hover:text-black px-4 py-2 rounded-xl text-sm font-semibold transition-all">
+        <Link href={`/dashboard/bookings/${booking.id}`}>
+        View Deatils 
+        </Link>
+        </Button>
+         <Button asChild className="bg-white/10 hover:bg-white text-white hover:text-black px-4 py-2 rounded-xl text-sm font-semibold transition-all">
+        <Link href={`/tutors/${tutorUser.id}`}>
+        View Tutor 
+        </Link>
+        </Button>
+</div>
       </div>
-
+      
       {/* Unique Animated Background Element */}
       <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-cyan-500/10 rounded-full blur-3xl group-hover:bg-cyan-500/20 transition-all" />
     </motion.div>

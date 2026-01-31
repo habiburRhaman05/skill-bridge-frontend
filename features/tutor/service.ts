@@ -105,7 +105,8 @@ export const getAllSession = async ()=>{
 export const addAvailability = async (payload:addAvailabilityPayload)=>{
 
 
-            const token = await getToken()
+  try {
+              const token = await getToken()
         if (!token) return null;
     const response = await fetch(`${process.env.API_URL}/api/tutor/availability`, {
     method: "PUT",
@@ -118,10 +119,14 @@ export const addAvailability = async (payload:addAvailabilityPayload)=>{
   });
 
   const result = await response.json();
-  if (!response.ok) throw new Error(result.message || "Failed to create  time slot ");
+  // if (!response.ok) throw new Error(result.message || "Failed to create  time slot ");
 
   revalidatePath("/tutor/dashboard/availability")
   return result;
+  } catch (error) {
+    console.log("error",error);
+    
+  }
  
 }
 export const getAllAvailability = async ()=>{
@@ -142,4 +147,51 @@ export const getAllAvailability = async ()=>{
   return result;
  
 
+}
+
+export async function getTutorReviews(tutorId: string) {
+  try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get("token")?.value;
+
+    const response = await fetch(`http://localhost:5000/api/review/${tutorId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        // কুকি থেকে টোকেন নিয়ে হেডার হিসেবে পাঠানো হচ্ছে
+        "Authorization": `Bearer ${token}`,
+      },
+      // সার্ভার টু সার্ভার ফেচিংয়ে ক্যাশিং কন্ট্রোল
+      cache: "no-store", 
+    });
+
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error("Fetch Error:", error);
+    return { success: false, message: "Server connection failed" };
+  }
+}
+export async function getTutorDashboardData(tutorId: string) {
+  try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get("token")?.value;
+    
+    const response = await fetch(`http://localhost:5000/api/tutor/dashboard-data/${tutorId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        // কুকি থেকে টোকেন নিয়ে হেডার হিসেবে পাঠানো হচ্ছে
+        "Authorization": `Bearer ${token}`,
+      },
+      // সার্ভার টু সার্ভার ফেচিংয়ে ক্যাশিং কন্ট্রোল
+      cache: "no-store", 
+    });
+
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error("Fetch Error:", error);
+    return { success: false, message: "Server connection failed" };
+  }
 }

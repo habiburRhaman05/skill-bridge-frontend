@@ -53,6 +53,6 @@ export type StudentBooking = {
 
 export type addAvailabilityPayload = {
    date: Date;
-    start: string | undefined;
-    end: string | undefined;
+    startTime: string | undefined;
+    endTime: string | undefined;
 }
