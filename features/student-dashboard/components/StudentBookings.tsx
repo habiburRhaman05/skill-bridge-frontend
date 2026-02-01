@@ -47,42 +47,7 @@ export default function StudentBookings({data}:{data:any}) {
           <h1 className="text-2xl font-bold">My Bookings</h1>
           <p className="text-sm text-zinc-500">Manage and track sessions</p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm">Download History</Button>
-          <Button size="sm">New Booking</Button>
-        </div>
       </div>
-
-      <Card>
-        <CardContent className="p-4 flex gap-4">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
-            <Input className="pl-9" placeholder="Search..." />
-          </div>
-
-          <Select value={filterStatus} onValueChange={setFilterStatus}>
-            <SelectTrigger className="w-[140px]">
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All</SelectItem>
-              <SelectItem value="confirmed">Confirmed</SelectItem>
-              <SelectItem value="completed">Completed</SelectItem>
-              <SelectItem value="cancelled">Cancelled</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Select value={sortOrder} onValueChange={setSortOrder}>
-            <SelectTrigger className="w-[140px]">
-              <SelectValue placeholder="Sort" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="latest">Latest</SelectItem>
-              <SelectItem value="old">Oldest</SelectItem>
-            </SelectContent>
-          </Select>
-        </CardContent>
-      </Card>
 
       <AnimatePresence>
         {isLoading

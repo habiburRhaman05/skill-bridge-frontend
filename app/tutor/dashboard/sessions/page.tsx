@@ -1,9 +1,9 @@
 import { Badge } from "@/components/ui/badge";
 import { SessionList } from "@/features/tutor/components/SessionsList";
-import { getAllSession } from "@/features/tutor/service";
+import { getAllSession } from "@/features/tutor/services";
 import { StudentBooking } from "@/features/tutor/types";
 
-export default async function MySessionsPage() {
+export default async function TutorSessionsPage() {
   const res = await getAllSession();
   const data: StudentBooking[] = res.data;
 

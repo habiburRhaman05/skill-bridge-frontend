@@ -1,110 +1,153 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, Clock, DollarSign, BookOpen, UserCheck, MoreVertical } from 'lucide-react';
+import { 
+  Calendar, DollarSign, BookOpen, 
+  UserCheck, MoreVertical, Trash2, ExternalLink, Loader2 
+} from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
-export const BookingCard = ({ booking }:{booking:any}) => {
+export const BookingCard = ({ booking }: { booking: any }) => {
   const { tutor, dateTime, status, id } = booking;
   const tutorUser = tutor.user;
-  
-  // Format the date from the ISO string: 2026-01-31T00:00:00.000Z
+  const [isCancelling, setIsCancelling] = useState(false);
+
+  const handleCancelBooking = async () => {
+    setIsCancelling(true);
+    const toastId = toast.loading("Processing cancellation...");
+    try {
+      await new Promise((res, rej) => setTimeout(() => Math.random() > 0.1 ? res(true) : rej(), 2000));
+      toast.success("Booking cancelled", { id: toastId });
+    } catch (error) {
+      toast.error("Failed to cancel", { id: toastId });
+    } finally {
+      setIsCancelling(false);
+    }
+  };
+
   const eventDate = new Date(dateTime).toLocaleDateString('en-US', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
+    weekday: 'short', month: 'short', day: 'numeric', year: 'numeric',
   });
 
   return (
-    <motion.div 
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      whileHover={{ y: -5 }}
-      className="relative group bg-white/5 backdrop-blur-xl border border-white/10 p-6 rounded-3xl overflow-hidden transition-all hover:border-cyan-500/50 shadow-2xl"
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      whileHover={{ y: -4 }}
+      className={cn(
+        "relative group overflow-hidden transition-all duration-300",
+        "rounded-[2rem] p-6 shadow-xl",
+        // Light Mode: Soft white glass, subtle border
+        "bg-white/70 backdrop-blur-md border border-zinc-200/50 shadow-zinc-200/50",
+        // Dark Mode: Deep zinc glass, sharper border
+        "dark:bg-zinc-900/50 dark:border-white/10 dark:shadow-none dark:hover:border-cyan-500/30"
+      )}
     >
-      {/* Top Section: Status & Actions */}
+      {/* Top Section */}
       <div className="flex justify-between items-start mb-6">
-        <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold tracking-wider uppercase border ${
-          status === 'CONFIRMED' 
-          ? 'bg-green-500/10 text-green-400 border-green-500/20' 
-          : 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20'
-        }`}>
-          <div className={`w-2 h-2 rounded-full animate-pulse ${status === 'CONFIRMED' ? 'bg-green-400' : 'bg-yellow-400'}`} />
+        <div className={cn(
+          "flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-black tracking-widest uppercase border",
+          status === 'CONFIRMED'
+            ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20 dark:text-emerald-400"
+            : "bg-amber-500/10 text-amber-600 border-amber-500/20 dark:text-amber-400"
+        )}>
+          <span className={cn(
+            "w-1.5 h-1.5 rounded-full animate-pulse",
+            status === 'CONFIRMED' ? "bg-emerald-500" : "bg-amber-500"
+          )} />
           {status}
         </div>
-        <button className="text-slate-400 hover:text-white transition-colors">
-          <MoreVertical size={20} />
-        </button>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-zinc-500 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-white/10">
+              <MoreVertical size={18} />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-48 p-2 rounded-2xl bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-2xl">
+            <DropdownMenuItem asChild className="rounded-xl cursor-pointer focus:bg-zinc-100 dark:focus:bg-white/5 py-2.5">
+              <Link href={`/dashboard/bookings/${id}`} className="flex items-center gap-2 font-medium">
+                <ExternalLink size={16} className="text-blue-500" /> View Details
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem 
+              onClick={handleCancelBooking}
+              disabled={isCancelling || status === 'CANCELLED'}
+              className="rounded-xl cursor-pointer focus:bg-red-50 dark:focus:bg-red-500/10 py-2.5 text-red-600 dark:text-red-400 font-medium"
+            >
+              {isCancelling ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
+              Cancel Booking
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
-      {/* Tutor Profile Section */}
-      
-      
+      {/* Tutor Profile */}
       <div className="flex items-center gap-4 mb-6">
-        <div className="relative">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-2xl font-black text-white shadow-lg">
-            {tutorUser.profileAvater ? (
-              <img src={tutorUser.profileAvater} alt={tutorUser.name} className="w-full h-full object-cover rounded-2xl" />
-            ) : (
-              tutorUser.name[0]
-            )}
+        <div className="relative shrink-0">
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-600 to-cyan-400 p-[2px] shadow-lg shadow-blue-500/20">
+            <div className="w-full h-full rounded-[14px] bg-white dark:bg-zinc-950 overflow-hidden">
+              {tutorUser.profileAvater ? (
+                <img src={tutorUser.profileAvater} alt="" className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center font-bold text-zinc-400">{tutorUser.name[0]}</div>
+              )}
+            </div>
           </div>
-          <div className="absolute -bottom-1 -right-1 bg-blue-500 p-1 rounded-lg border-2 border-[#0f172a]">
-            <UserCheck size={12} className="text-white" />
+          <div className="absolute -bottom-1 -right-1 bg-blue-600 text-white p-1 rounded-lg ring-2 ring-white dark:ring-zinc-900">
+            <UserCheck size={10} />
           </div>
         </div>
-        
-        <div>
-          <h3 className="text-xl font-bold text-white group-hover:text-cyan-400 transition-colors">
+
+        <div className="overflow-hidden">
+          <h3 className="text-base font-bold text-zinc-900 dark:text-white truncate">
             {tutorUser.name}
           </h3>
-          <p className="text-slate-400 text-sm flex items-center gap-1">
-            <BookOpen size={14} className="text-cyan-500" />
-            {tutor.subjects.join(", ")} • {tutor.category}
+          <p className="text-zinc-500 dark:text-zinc-400 text-xs flex items-center gap-1.5 truncate">
+            <BookOpen size={12} className="text-cyan-500" />
+            {tutor.subjects[0]} • {tutor.category}
           </p>
         </div>
       </div>
-   
 
       {/* Details Grid */}
-      <div className="grid grid-cols-2 gap-4 py-4 border-y border-white/5 mb-6">
-        <div className="flex flex-col gap-1">
-          <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Schedule</span>
-          <div className="flex items-center gap-2 text-sm text-slate-200">
-            <Calendar size={14} className="text-cyan-500" />
+      <div className="grid grid-cols-2 gap-4 py-4 border-y border-zinc-100 dark:border-white/5 mb-6">
+        <div className="space-y-1">
+          <span className="text-[10px] text-zinc-400 dark:text-zinc-500 uppercase tracking-tighter font-bold">Schedule</span>
+          <div className="flex items-center gap-1.5 text-xs font-semibold text-zinc-700 dark:text-zinc-300">
+            <Calendar size={14} className="text-blue-500" />
             {eventDate}
           </div>
         </div>
-        <div className="flex flex-col gap-1">
-          <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Rate</span>
-          <div className="flex items-center gap-2 text-sm text-slate-200">
-            <DollarSign size={14} className="text-green-400" />
-            <span className="font-mono">${tutor.hourlyRate}/hr</span>
+        <div className="space-y-1">
+          <span className="text-[10px] text-zinc-400 dark:text-zinc-500 uppercase tracking-tighter font-bold">Hourly Rate</span>
+          <div className="flex items-center gap-1.5 text-xs font-semibold text-zinc-700 dark:text-zinc-300">
+            <DollarSign size={14} className="text-emerald-500" />
+            <span className="font-mono">৳{tutor.hourlyRate}</span>
           </div>
         </div>
       </div>
 
-      {/* Footer / ID */}
-      <div className="flex items-center justify-between">
-        <span className="text-[10px] font-mono text-slate-600">ID: #{id.split('-')[0]}</span>
-<div className="flex gap-4">
-          <Button asChild className="bg-blue-600 hover:bg-white text-white hover:text-black px-4 py-2 rounded-xl text-sm font-semibold transition-all">
-        <Link href={`/dashboard/bookings/${booking.id}`}>
-        View Deatils 
-        </Link>
-        </Button>
-         <Button asChild className="bg-white/10 hover:bg-white text-white hover:text-black px-4 py-2 rounded-xl text-sm font-semibold transition-all">
-        <Link href={`/tutors/${tutorUser.id}`}>
-        View Tutor 
-        </Link>
-        </Button>
-</div>
+      {/* Actions */}
+      <div className="flex items-center justify-between gap-4">
+        <span className="text-[10px] font-mono text-zinc-400 dark:text-zinc-600">ID: #{id.slice(0, 6)}</span>
+        <div className="flex gap-2">
+          <Button asChild size="sm" className="h-9 px-4 rounded-xl bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200 transition-all font-bold text-xs">
+            <Link href={`/dashboard/bookings/${id}`}>View Details</Link>
+          </Button>
+        </div>
       </div>
-      
-      {/* Unique Animated Background Element */}
-      <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-cyan-500/10 rounded-full blur-3xl group-hover:bg-cyan-500/20 transition-all" />
+
+      {/* Decorative Glow */}
+      <div className="absolute -bottom-12 -right-12 w-32 h-32 bg-blue-500/10 dark:bg-cyan-500/10 rounded-full blur-3xl pointer-events-none group-hover:bg-blue-500/20 transition-all duration-500" />
     </motion.div>
   );
 };
-

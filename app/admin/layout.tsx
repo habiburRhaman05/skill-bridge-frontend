@@ -1,9 +1,40 @@
+import Header from '@/components/layout/Header';
+import { DashboardSidebar } from '@/components/layout/SideBar';
+import { getProfile } from '@/features/auth/services';
+import TutorOnboarding from '@/features/tutor/components/TutorOnboarding';
+import { redirect } from 'next/navigation';
 import React from 'react'
 
-const layout = () => {
+const TutorDashbaordLayout = async({children}:{
+    children:React.ReactNode
+}) => {
+   const {user} = await getProfile();
+console.log("admin ",user);
+
+
+   if(!user || user.error){
+    redirect("/sign-in")
+   }
+   if(user.data.role !== "ADMIN"){
+    redirect("/")
+   }
+
+
   return (
-    <div>layout</div>
+    <main className='w-full '>
+      
+<Header/>
+    <div className=' w-full flex'>
+  <DashboardSidebar
+      userRole={user.data.role}
+      />
+
+        <div className=' w-full'>
+          { children }
+        </div>
+    </div>
+    </main>
   )
 }
 
-export default layout
+export default TutorDashbaordLayout

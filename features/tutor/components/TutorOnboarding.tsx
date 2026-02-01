@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { useMutation } from "@tanstack/react-query";
-import { tutorOnboardingHandler } from "../service";
+import { tutorOnboardingHandler } from "../services";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";

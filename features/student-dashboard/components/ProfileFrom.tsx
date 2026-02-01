@@ -1,17 +1,24 @@
 "use client";
 
 import React, { useState, useMemo, useRef } from "react";
-import { Mail, X, Info, ImagePlus, Loader2 } from "lucide-react";
+import { 
+  Mail, X, Info, ImagePlus, Loader2, Save, 
+  MapPin, Phone, Heart, User, Sparkles 
+} from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { motion, AnimatePresence } from "framer-motion";
 
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
+import { 
+  Dialog, DialogContent, DialogHeader, 
+  DialogTitle, DialogFooter, DialogDescription 
+} from "@/components/ui/dialog";
 
 import { updateProfile, updateAvatar } from "../services";
 import { cn } from "@/lib/utils";
@@ -21,6 +28,10 @@ interface UserProps {
     name: string;
     email: string;
     profileAvater: string;
+    // Added fields assuming they might exist or will be handled by the same profile mutation
+    phone?: string;
+    location?: string;
+    hobbies?: string[];
   };
 }
 
@@ -28,20 +39,24 @@ export default function StudentProfileForm({ userData }: UserProps) {
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // --- State ---
+  // --- 1. State Management ---
   const [formData, setFormData] = useState({
     name: userData?.name || "",
-    profileAvater: userData?.profileAvater || "",
+    phone: userData?.phone || "",
+    location: userData?.location || "",
+    hobbies: userData?.hobbies || [],
   });
+
+  const [hobbyInput, setHobbyInput] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [tempPreview, setTempPreview] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // --- Mutations ---
+  // --- 2. Mutations ---
   const profileMutation = useMutation({
     mutationFn: updateProfile,
     onSuccess: () => {
-      toast.success("Profile updated");
+      toast.success("Profile updated successfully");
       queryClient.invalidateQueries({ queryKey: ["user-session"] });
     },
     onError: (err: any) => toast.error(err.message),
@@ -51,19 +66,26 @@ export default function StudentProfileForm({ userData }: UserProps) {
     mutationFn: updateAvatar,
     onSuccess: () => {
       setIsModalOpen(false);
+      setTempPreview(null);
       toast.success("Avatar updated");
       queryClient.invalidateQueries({ queryKey: ["user-session"] });
     },
     onError: () => toast.error("Upload failed"),
   });
 
-  // --- Logic ---
-  const isDirty = useMemo(() => formData.name !== userData.name, [formData, userData]);
+  // --- 3. Logic & Validation ---
+  const isDirty = useMemo(() => {
+    return (
+      formData.name !== userData.name ||
+      formData.phone !== (userData.phone || "") ||
+      formData.location !== (userData.location || "") ||
+      JSON.stringify(formData.hobbies) !== JSON.stringify(userData.hobbies || [])
+    );
+  }, [formData, userData]);
 
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
     setSelectedFile(file);
     const reader = new FileReader();
     reader.onloadend = () => {
@@ -74,123 +96,209 @@ export default function StudentProfileForm({ userData }: UserProps) {
   };
 
   const handleSaveDetails = () => {
-    if (isDirty) profileMutation.mutate(formData);
+  
+    if (isDirty) profileMutation.mutate({
+      name:formData.name
+    });
+  };
+
+  const toggleHobby = (hobby: string) => {
+    setFormData(prev => ({
+      ...prev,
+      hobbies: prev.hobbies.includes(hobby) 
+        ? prev.hobbies.filter(h => h !== hobby) 
+        : [...prev.hobbies, hobby]
+    }));
+  };
+
+  const addHobby = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && hobbyInput.trim()) {
+      e.preventDefault();
+      if (!formData.hobbies.includes(hobbyInput.trim())) {
+        toggleHobby(hobbyInput.trim());
+      }
+      setHobbyInput("");
+    }
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-8">
-      <input 
-        type="file" 
-        ref={fileInputRef} 
-        onChange={onFileChange} 
-        className="hidden" 
-        accept="image/*" 
-      />
+    <div className="min-h-screen bg-zinc-50/50 dark:bg-[#09090b] p-4 md:p-12 transition-colors duration-300">
+      <div className="max-w-6xl mx-auto space-y-10">
+        
+        {/* Hidden File Input */}
+        <input type="file" ref={fileInputRef} onChange={onFileChange} className="hidden" accept="image/*" />
 
-      {/* 1. Avatar Update Modal */}
+        {/* Header Section */}
+        <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
+          <div className="space-y-2">
+            <Badge variant="outline" className="rounded-full px-4 py-1.5 bg-indigo-500/10 text-indigo-500 border-indigo-500/20 font-black text-[10px] tracking-widest">
+              STUDENT PROFILE
+            </Badge>
+            <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tighter">Account Settings</h1>
+          </div>
+          <Button 
+            onClick={handleSaveDetails} 
+            disabled={!isDirty || profileMutation.isPending} 
+            className={cn(
+              "h-14 px-10 rounded-2xl font-black transition-all active:scale-95 shadow-xl",
+              isDirty ? "bg-indigo-600 text-white hover:bg-indigo-700" : "bg-zinc-200 dark:bg-zinc-800 text-zinc-400"
+            )}
+          >
+            {profileMutation.isPending ? <Loader2 className="animate-spin mr-2" /> : <Save className="mr-2" size={18} />}
+            Save Changes
+          </Button>
+        </header>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          
+          {/* Sidebar - Visual Identity */}
+          <aside className="lg:col-span-4 space-y-6">
+            <Card className="rounded-[40px] border-none bg-white dark:bg-zinc-900 shadow-xl overflow-hidden">
+              <CardContent className="p-10 flex flex-col items-center text-center">
+                <div className="relative mb-6">
+                  <div 
+                    className="w-40 h-40 rounded-[48px] overflow-hidden ring-8 ring-zinc-50 dark:ring-zinc-800 shadow-inner cursor-pointer group"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    <Avatar className="h-full w-full rounded-none">
+                      <AvatarImage src={userData.profileAvater} className="object-cover" />
+                      <AvatarFallback className="text-4xl bg-indigo-600 text-white font-black">
+                        {userData.name[0]}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <ImagePlus className="text-white w-8 h-8" />
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => fileInputRef.current?.click()}
+                    className="absolute -bottom-2 -right-2 bg-indigo-600 text-white p-4 rounded-2xl shadow-2xl hover:scale-110 active:scale-90 transition-all"
+                  >
+                    <ImagePlus size={20} />
+                  </button>
+                </div>
+                <h2 className="text-2xl font-black tracking-tight">{userData.name}</h2>
+                <div className="flex items-center gap-2 mt-2 text-zinc-400 font-bold text-xs">
+                  <Mail size={12} className="text-indigo-500" /> {userData.email}
+                </div>
+              </CardContent>
+            </Card>
+
+          
+          </aside>
+
+          {/* Main Form Area */}
+          <main className="lg:col-span-8 space-y-8">
+            <Card className="rounded-[40px] border-none bg-white dark:bg-zinc-900 p-8 md:p-12 shadow-xl">
+              <div className="space-y-10">
+                
+                {/* Section: Basic Info */}
+                <section className="space-y-6">
+                  <div className="flex items-center gap-4">
+                    <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-indigo-500">Personal Details</h3>
+                    <div className="h-px flex-1 bg-zinc-100 dark:bg-zinc-800" />
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="space-y-3">
+                      <Label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Full Name</Label>
+                      <div className="relative">
+                        <User className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={18} />
+                        <Input 
+                          value={formData.name} 
+                          onChange={e => setFormData({...formData, name: e.target.value})}
+                          className="h-14 rounded-2xl bg-zinc-50 dark:bg-zinc-800 border-none pl-12 font-bold focus-visible:ring-2 focus-visible:ring-indigo-500" 
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-3">
+                      <Label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Phone Number</Label>
+                      <div className="relative">
+                        <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={18} />
+                        <Input 
+                          value={formData.phone} 
+                          onChange={e => setFormData({...formData, phone: e.target.value})}
+                          placeholder="+880 1XXX-XXXXXX"
+                          className="h-14 rounded-2xl bg-zinc-50 dark:bg-zinc-800 border-none pl-12 font-bold focus-visible:ring-2 focus-visible:ring-indigo-500" 
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                {/* Section: Location & Background */}
+                <section className="space-y-6">
+                  <div className="flex items-center gap-4">
+                    <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-indigo-500">Address & Background</h3>
+                    <div className="h-px flex-1 bg-zinc-100 dark:bg-zinc-800" />
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Current Location</Label>
+                    <div className="relative">
+                      <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={18} />
+                      <Input 
+                        value={formData.location} 
+                        onChange={e => setFormData({...formData, location: e.target.value})}
+                        placeholder="e.g. Dhaka, Bangladesh"
+                        className="h-14 rounded-2xl bg-zinc-50 dark:bg-zinc-800 border-none pl-12 font-bold focus-visible:ring-2 focus-visible:ring-indigo-500" 
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Interests & Hobbies</Label>
+                    <div className="flex flex-wrap gap-2 min-h-[60px] p-5 rounded-[2rem] bg-zinc-50 dark:bg-zinc-800/50">
+                      <AnimatePresence mode="popLayout">
+                        {formData.hobbies.map(hobby => (
+                          <motion.div key={hobby} layout initial={{scale:0.8, opacity:0}} animate={{scale:1, opacity:1}} exit={{scale:0.5, opacity:0}}>
+                            <Badge className="pl-4 pr-2 py-2 rounded-xl bg-indigo-600 text-white border-none text-[10px] font-black uppercase tracking-wider">
+                              {hobby} 
+                              <button onClick={() => toggleHobby(hobby)} className="ml-2 p-1 hover:bg-white/20 rounded-md transition-colors">
+                                <X size={12} />
+                              </button>
+                            </Badge>
+                          </motion.div>
+                        ))}
+                      </AnimatePresence>
+                      <input 
+                        value={hobbyInput}
+                        onChange={(e) => setHobbyInput(e.target.value)}
+                        onKeyDown={addHobby}
+                        placeholder="Add hobby and press Enter..."
+                        className="flex-1 min-w-[150px] bg-transparent border-none focus:outline-none text-sm font-bold text-zinc-600 placeholder:text-zinc-400"
+                      />
+                    </div>
+                  </div>
+                </section>
+              </div>
+            </Card>
+          </main>
+        </div>
+      </div>
+
+      {/* --- Avatar Confirmation Modal --- */}
       <Dialog open={isModalOpen} onOpenChange={(val) => !avatarMutation.isPending && setIsModalOpen(val)}>
-        <DialogContent className="bg-zinc-950 border-zinc-800 text-white max-w-sm rounded-[2rem]">
+        <DialogContent className="rounded-[40px] border-none bg-white dark:bg-zinc-950 p-10 shadow-3xl max-w-sm">
           <DialogHeader>
-            <DialogTitle>New Profile Picture</DialogTitle>
-            <DialogDescription>Look good? Confirm to save changes.</DialogDescription>
+            <DialogTitle className="text-center font-black uppercase tracking-tighter text-2xl">New Avatar</DialogTitle>
+            <DialogDescription className="text-center font-bold text-zinc-500">Confirm your professional identity update.</DialogDescription>
           </DialogHeader>
-          <div className="flex justify-center py-6">
-            <Avatar className="h-40 w-40 border-4 border-indigo-600/50 shadow-xl">
-              <AvatarImage src={tempPreview || ""} className="object-cover" />
-            </Avatar>
+          <div className="flex flex-col items-center py-6">
+            <div className="w-44 h-44 rounded-[56px] overflow-hidden ring-8 ring-indigo-50 dark:ring-indigo-900/20 shadow-2xl mb-6">
+              <img src={tempPreview || ""} className="w-full h-full object-cover" alt="Preview" />
+            </div>
           </div>
           <DialogFooter className="grid grid-cols-2 gap-3">
-            <Button 
-              variant="outline" 
-              className="rounded-xl border-zinc-800" 
-              onClick={() => setIsModalOpen(false)} 
-              disabled={avatarMutation.isPending}
-            >
+            <Button variant="ghost" className="rounded-2xl font-bold h-12" onClick={() => setIsModalOpen(false)} disabled={avatarMutation.isPending}>
               Cancel
             </Button>
-            <Button 
-              onClick={() => avatarMutation.mutate(selectedFile!)} 
-              disabled={avatarMutation.isPending} 
-              className="bg-indigo-600 hover:bg-indigo-700 rounded-xl"
-            >
+            <Button className="rounded-2xl font-black bg-indigo-600 text-white h-12" onClick={() => avatarMutation.mutate(selectedFile!)} disabled={avatarMutation.isPending}>
               {avatarMutation.isPending ? <Loader2 className="animate-spin" /> : "Confirm"}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
-      {/* 2. Hero Profile Section */}
-      <div className="relative overflow-hidden bg-zinc-900 border border-zinc-800 p-8 rounded-[2.5rem] flex flex-col md:flex-row items-center gap-8">
-        <div 
-          className="relative group cursor-pointer" 
-          onClick={() => fileInputRef.current?.click()}
-        >
-          <Avatar className="h-32 w-32 border-4 border-zinc-950 shadow-2xl transition-transform group-hover:scale-105">
-            <AvatarImage src={userData.profileAvater} className="object-cover" />
-            <AvatarFallback className="text-3xl bg-indigo-600 text-white">
-              {userData.name[0]}
-            </AvatarFallback>
-          </Avatar>
-          <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-full">
-            <ImagePlus className="text-white w-8 h-8" />
-          </div>
-        </div>
-
-        <div className="flex-1 text-center md:text-left space-y-1">
-          <Badge className="bg-indigo-500/10 text-indigo-400 border-indigo-500/20 mb-2">
-            Student Account
-          </Badge>
-          <h1 className="text-3xl font-bold text-white tracking-tight">{userData.name}</h1>
-          <div className="flex items-center gap-2 text-zinc-500 justify-center md:justify-start">
-            <Mail size={14} />
-            <span className="text-sm">{userData.email}</span>
-          </div>
-        </div>
-      </div>
-
-      {/* 3. Settings Form */}
-      <Card className="bg-zinc-950 border-zinc-900 rounded-[2rem] overflow-hidden">
-        <CardHeader className="border-b border-zinc-900/50 bg-zinc-900/20 p-8">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-indigo-500/10 rounded-lg">
-              <Info size={20} className="text-indigo-500" />
-            </div>
-            <div>
-              <CardTitle className="text-lg">Personal Information</CardTitle>
-              <p className="text-sm text-zinc-500">Update your public profile name.</p>
-            </div>
-          </div>
-        </CardHeader>
-
-        <CardContent className="p-8">
-          <div className="space-y-2 max-w-md">
-            <Label className="text-zinc-500 text-xs font-bold uppercase tracking-wider">
-              Display Name
-            </Label>
-            <Input 
-              value={formData.name} 
-              onChange={(e) => setFormData(p => ({...p, name: e.target.value}))}
-              className="bg-zinc-900 border-zinc-800 text-white h-12 rounded-xl focus:ring-indigo-600" 
-            />
-          </div>
-        </CardContent>
-
-        <CardFooter className="p-8 pt-0 flex items-center justify-between border-t border-zinc-900/50 bg-zinc-900/10 mt-6">
-          <p className="text-xs text-zinc-600">
-            {isDirty ? "You have unsaved changes" : "Your profile is up to date"}
-          </p>
-          <Button 
-            onClick={handleSaveDetails} 
-            disabled={!isDirty || profileMutation.isPending} 
-            className={cn(
-              "px-8 h-11 rounded-xl font-semibold transition-all",
-              isDirty ? "bg-indigo-600 text-white" : "bg-zinc-800 text-zinc-500"
-            )}
-          >
-            {profileMutation.isPending ? <Loader2 className="animate-spin" /> : "Save Changes"}
-          </Button>
-        </CardFooter>
-      </Card>
     </div>
   );
 }

@@ -186,9 +186,36 @@ export async function getTutorDashboardData(tutorId: string) {
       },
       // সার্ভার টু সার্ভার ফেচিংয়ে ক্যাশিং কন্ট্রোল
       cache: "no-store", 
+      
     });
 
     const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error("Fetch Error:", error);
+    return { success: false, message: "Server connection failed" };
+  }
+}
+export async function updateSessionStatus(payload:any) {
+  try {
+   
+    const token = await getToken()
+    console.log(payload);
+    
+    
+    const response = await fetch(`http://localhost:5000/api/tutor/sessions/${payload.sessionId}/finish-session`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+     
+    body: JSON.stringify(payload.body),
+
+    });
+
+    const result = await response.json();
+    revalidatePath("/tutor/dashboard/sessions")
     return result;
   } catch (error) {
     console.error("Fetch Error:", error);

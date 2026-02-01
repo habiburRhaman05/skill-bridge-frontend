@@ -8,6 +8,7 @@ export default async function BookingDetailPage({ params }: { params: { id: stri
   
   // Fetch data on the server
   const booking = await getBookingDetails(id);
+console.log(booking);
 
   if (!booking) {
     return (

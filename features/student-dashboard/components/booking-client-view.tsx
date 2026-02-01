@@ -55,7 +55,7 @@ export default function BookingClientView({ booking }: { booking: any }) {
     <div className="min-h-screen bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 font-sans antialiased">
       <header className="max-w-5xl mx-auto px-6 py-10 flex items-center justify-between border-b border-zinc-100 dark:border-zinc-900">
         <div className="flex items-center gap-4">
-          <Link href="/dashboard">
+          <Link href="/dashboard/bookings">
             <Button variant="ghost" size="icon" className="rounded-full">
               <ChevronLeft size={20} />
             </Button>
@@ -85,15 +85,30 @@ export default function BookingClientView({ booking }: { booking: any }) {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-5">
                   <div className="w-16 h-16 rounded-2xl bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center overflow-hidden">
-                    {tutor?.user?.profileAvater ? (
-                      <img src={tutor.user.profileAvater} alt="Tutor" className="object-cover w-full h-full" />
+                    {tutor?.profileAvater ? (
+                      <img src={tutor.profileAvater} alt="Tutor" className="object-cover w-full h-full" />
                     ) : (
                       <span className="text-xl font-bold text-zinc-400">{tutor?.category?.[0] || 'T'}</span>
                     )}
                   </div>
                   <div>
-                    <p className="text-sm font-semibold">Tutor ID: {tutor?.id.slice(0, 8)}</p>
+                    <p className="text-sm font-semibold">{tutor?.name}</p>
                     <p className="text-xs text-zinc-500 tracking-tight">{tutor?.category}</p>
+                  </div>
+                </div>
+                <div className="p-4">
+                  -
+                </div>
+                <div className="flex items-center gap-5">
+                  <div className="w-16 h-16 rounded-2xl bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center overflow-hidden">
+              
+                      <img src={student.profileAvater} alt="Student" className="object-cover w-full h-full" />
+                    
+                   
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold">{student?.name}</p>
+                    <p className="text-xs text-zinc-500 tracking-tight">{student?.location || "Dhaka,Bangladesh"}</p>
                   </div>
                 </div>
               </div>
@@ -156,22 +171,19 @@ export default function BookingClientView({ booking }: { booking: any }) {
                   <p className="text-3xl font-semibold tracking-tighter">৳{tutor?.hourlyRate || 0}</p>
                 </div>
                 
-                <div className="pt-6 border-t border-zinc-50 dark:border-zinc-900 space-y-4">
-                  <div className="flex items-center gap-3 text-xs font-medium text-emerald-600 bg-emerald-50 dark:bg-emerald-500/10 p-4 rounded-2xl">
-                    <ShieldCheck size={16} />
-                    Payment Method Verified
-                  </div>
-
-                  {/* Show button ONLY if status is completed AND there is no existing review */}
+         
                   {booking.data.status === "COMPLETED" && !review && (
-                    <Button 
+                          <div className="pt-4 border-t border-zinc-50 dark:border-zinc-900 space-y-4">
+                 
+ <Button 
                       onClick={() => setIsReviewOpen(true)}
                       className="w-full h-14 rounded-2xl font-bold bg-indigo-600 hover:bg-indigo-700 text-white transition-all shadow-lg shadow-indigo-500/20"
                     >
                       <Star className="mr-2 fill-white" size={18} /> Leave a Review
                     </Button>
-                  )}
+                  {/* Show button ONLY if status is completed AND there is no existing review */}
                 </div>
+                  )}
               </Card>
             </div>
           </div>

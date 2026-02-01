@@ -11,7 +11,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAuthHandlers } from "@/features/auth/auth-handler";
-import { addAvailability } from "@/features/tutor/service";
+import { addAvailability } from "@/features/tutor/services";
 import { useMutation } from "@tanstack/react-query";
 
 const TIME_OPTIONS = Array.from({ length: 24 * 2 }, (_, i) => {

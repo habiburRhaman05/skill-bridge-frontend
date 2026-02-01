@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns"; // npm install date-fns
-import { getTutorDashboardData } from "@/features/tutor/service";
+import { getTutorDashboardData } from "@/features/tutor/services";
 
 // --- Types based on your API Output ---
 interface DashboardData {

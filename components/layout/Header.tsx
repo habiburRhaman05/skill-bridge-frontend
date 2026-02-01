@@ -127,7 +127,7 @@ const {data,isLoading,isError} = useQuery({
                   <Menu className="h-5 w-5" />
                 </Button>
               </SheetTrigger>}
-              <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+              <SheetContent side="right" className="w-[300px] p-4 sm:w-[400px]">
                 <SheetHeader className="text-left">
                   <SheetTitle className="flex items-center gap-2">
                     <Command className="h-5 w-5 text-indigo-600" />

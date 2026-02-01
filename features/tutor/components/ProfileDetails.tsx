@@ -23,7 +23,7 @@ import { tutorProfileType } from "../types";
 import { toast } from "sonner";
 import { useApiQuery } from "@/hooks/useApiQuery";
 import { useMutation } from "@tanstack/react-query";
-import { updateTutorAvatar, updateTutorProfile } from "../service";
+import { updateTutorAvatar, updateTutorProfile } from "../services";
 
 export default function TutorProfilePage({ tutor }: { tutor: tutorProfileType }) {
   // --- 1. Fetch Categories ---
@@ -97,6 +97,7 @@ const avatarMutation = useMutation({
   // --- 4. API Actions ---
   const handleSave = async () => {
     if (!isDirty) return;
+   
    const {name,...others} = profile
     const paylaod = {
         user:{
@@ -104,10 +105,9 @@ const avatarMutation = useMutation({
         },
         ...others
     }
-    console.log(paylaod);
+ 
+    await profileMutation.mutateAsync(paylaod)
     
-    
-//    await profileMutation.mutateAsync(paylaod)
   };
 
   const confirmUpload = async () => {
@@ -135,11 +135,11 @@ const avatarMutation = useMutation({
             disabled={profileMutation.isPending || !isDirty}
             className={cn(
               "h-14 px-10 rounded-2xl font-black transition-all active:scale-95 shadow-xl",
-              isDirty ? "bg-zinc-900 dark:bg-zinc-50 text-white dark:text-black" : "bg-zinc-200 dark:bg-zinc-800 text-zinc-400"
+              isDirty ? "bg-blue-800 text-white " : "bg-zinc-600 dark:bg-zinc-800 text-zinc-400"
             )}
           >
             {profileMutation.isPending ? <Loader2 className="animate-spin mr-2" /> : <Save className="mr-2" />}
-            Sync Changes
+            Save Changes
           </Button>
         </header>
 
