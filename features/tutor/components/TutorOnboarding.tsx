@@ -78,6 +78,7 @@ const TutorOnboarding = () => {
       console.log(value);
       
       await handleOnboarding.mutateAsync(value);
+      router.push("/tutor/dashboard")
     },
   });
 

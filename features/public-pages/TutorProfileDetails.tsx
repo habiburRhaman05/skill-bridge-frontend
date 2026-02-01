@@ -352,9 +352,10 @@ const BookingModalContent = ({ tutor, selectedSlot, setDateTime, setSelectedSlot
         </div>
         <Button
           onClick={onConfirm}
-          disabled={!selectedSlot || isBooking}
+          disabled={!selectedSlot || isBooking || !tutor.availability.filter((item:any) => item.isBooked !== true).length }
           className="w-full h-14 rounded-2xl bg-indigo-600 text-white hover:bg-indigo-700 font-black text-lg shadow-xl shadow-indigo-100 dark:shadow-none"
         >
+         
           {isBooking ? <Loader2 className="animate-spin" /> : "Confirm & Book"}
         </Button>
       </div>

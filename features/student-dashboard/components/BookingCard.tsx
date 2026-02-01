@@ -14,23 +14,33 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { useMutation } from '@tanstack/react-query';
+import { httpRequest } from '@/config/axios/axios';
+import axios from 'axios';
 
 export const BookingCard = ({ booking }: { booking: any }) => {
   const { tutor, dateTime, status, id } = booking;
   const tutorUser = tutor.user;
-  const [isCancelling, setIsCancelling] = useState(false);
+ 
+   const updateCategoryMutation = useMutation({
+    mutationFn: ({ status }: {  status:string }) => 
+      axios.patch(`http://localhost:5000/api/booking/${id}/cancel-booking`, status, { withCredentials: true }),
+    onSuccess: () => {
+     
+       toast.success("Booking cancelled", { id });
+    
+    },
+    onError: () => toast.error("Failed to cancel booking"),
+  });
+
+  
+
 
   const handleCancelBooking = async () => {
-    setIsCancelling(true);
-    const toastId = toast.loading("Processing cancellation...");
-    try {
-      await new Promise((res, rej) => setTimeout(() => Math.random() > 0.1 ? res(true) : rej(), 2000));
-      toast.success("Booking cancelled", { id: toastId });
-    } catch (error) {
-      toast.error("Failed to cancel", { id: toastId });
-    } finally {
-      setIsCancelling(false);
-    }
+  await updateCategoryMutation.mutateAsync({
+    status:"CANCELLED"
+  })
+    
   };
 
   const eventDate = new Date(dateTime).toLocaleDateString('en-US', {
@@ -80,10 +90,10 @@ export const BookingCard = ({ booking }: { booking: any }) => {
             </DropdownMenuItem>
             <DropdownMenuItem 
               onClick={handleCancelBooking}
-              disabled={isCancelling || status === 'CANCELLED'}
+              disabled={ status === "COMPLETED" || updateCategoryMutation.isSuccess || status === 'CANCELLED'}
               className="rounded-xl cursor-pointer focus:bg-red-50 dark:focus:bg-red-500/10 py-2.5 text-red-600 dark:text-red-400 font-medium"
             >
-              {isCancelling ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
+              {updateCategoryMutation.isSuccess ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
               Cancel Booking
             </DropdownMenuItem>
           </DropdownMenuContent>

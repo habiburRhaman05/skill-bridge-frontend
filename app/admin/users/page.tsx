@@ -1,6 +1,6 @@
 import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { getAllUsersByAdmin } from "@/features/admin/services";
-import UserLists from "@/features/admin/UserLists";
+import UserLists from "@/features/admin/components/UserLists";
 
 const MOCK_USERS = [
   { id: "1", name: "Tanvir Ahmed", email: "tanvir@example.com", role: "Tutor", status: "active" },

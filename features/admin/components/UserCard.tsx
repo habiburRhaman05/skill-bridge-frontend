@@ -11,25 +11,46 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { updateUserStatus } from "../services";
+import axios from "axios";
 
-const UserCard = ({ user }: { user: any }) => {
-  // Local state for feedback loop: 'idle' | 'loading' | 'success'
-  const [statusFeedback, setStatusFeedback] = useState<'idle' | 'loading' | 'success'>('idle');
+const UserCard = ({ user }: { user: {
+  id:string;
+  name:string;
+  role:string;
+  createdAt:string;
+  status:string;
+  email:string;
+} }) => {
+console.log(user);
 
-  const handleStatusChange = (val: string) => {
-    setStatusFeedback('loading');
-    
-    // Dummy delay to simulate API call
-    setTimeout(() => {
-      setStatusFeedback('success');
+
+  const updateStatusMutation = useMutation({
+    mutationFn:(payload:{
+      userId:string;
+      body:{
+        status:string
+      }
+    })=> axios.patch(`http://localhost:5000/api/admin/users/${payload.userId}/status`,payload.body,{
+      withCredentials:true
+    }),
+    onSuccess:(res)=>{
+      console.log(res);
       
-      // Reset back to idle after showing success for 2 seconds
-      setTimeout(() => {
-        setStatusFeedback('idle');
-      }, 2000);
-    }, 1500);
+      // toast.success(res.data)
+    }
+  })
+  
 
-    // console.log(`Update ${user.id} to ${val}`);
+  const handleStatusChange = async(val: string) => {
+     await updateStatusMutation.mutateAsync({
+     userId:user.id,
+     body:{
+      status:val
+     }
+     })
   };
 
   return (
@@ -68,20 +89,20 @@ const UserCard = ({ user }: { user: any }) => {
         <div className="relative flex items-center">
           <Select 
             defaultValue={user.status} 
-            disabled={statusFeedback === 'loading'}
+            disabled={updateStatusMutation.isPending}
             onValueChange={handleStatusChange}
           >
             <SelectTrigger className={cn(
               "w-40 h-10 rounded-xl border-none font-black text-[10px] uppercase tracking-widest transition-all shadow-sm",
               user.status === "ACTIVE" ? "bg-emerald-500/10 text-emerald-600" : "bg-rose-500/10 text-rose-600",
-              statusFeedback === 'success' && "bg-emerald-500 text-white" // Flash green on success
+              updateStatusMutation.isSuccess && "bg-emerald-500 text-white" // Flash green on success
             )}>
-              {statusFeedback === 'loading' ? (
+              {updateStatusMutation.isPending ? (
                 <div className="flex items-center gap-2">
                   <Loader2 className="h-3 w-3 animate-spin" />
                   <span>Syncing...</span>
                 </div>
-              ) : statusFeedback === 'success' ? (
+              ) : updateStatusMutation.isSuccess ? (
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="h-3 w-3" />
                   <span>Updated</span>
