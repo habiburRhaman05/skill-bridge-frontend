@@ -26,7 +26,6 @@ export default function BookingClientView({ booking }: { booking: any }) {
     onSuccess: (res) => {
       toast.success("Review submitted successfully");
       setIsReviewOpen(false);
-      // Note: You should ideally invalidate the query here to refresh the data
     },
     onError: (error: any) => {
       toast.error(error?.message || "Failed to submit review");

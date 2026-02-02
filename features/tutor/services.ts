@@ -76,8 +76,8 @@ console.log("fromdata",formData);
 
   
   return response.json();
-} catch (error) {
-  console.log("erro",error);
+} catch  {
+
   
 }
 };
@@ -154,7 +154,7 @@ export async function getTutorReviews(tutorId: string) {
     const cookieStore = await cookies();
     const token = cookieStore.get("token")?.value;
 
-    const response = await fetch(`http://localhost:5000/api/review/${tutorId}`, {
+    const response = await fetch(`${process.env.API_URL}/api/review/${tutorId}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -177,7 +177,7 @@ export async function getTutorDashboardData(tutorId: string) {
     const cookieStore = await cookies();
     const token = cookieStore.get("token")?.value;
     
-    const response = await fetch(`http://localhost:5000/api/tutor/dashboard-data/${tutorId}`, {
+    const response = await fetch(`${process.env.API_URL}/api/tutor/${tutorId}/get-dashboard-data`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -203,7 +203,7 @@ export async function updateSessionStatus(payload:any) {
     console.log(payload);
     
     
-    const response = await fetch(`http://localhost:5000/api/tutor/sessions/${payload.sessionId}/finish-session`, {
+    const response = await fetch(`${process.env.API_URL}/api/tutor/sessions/${payload.sessionId}/finish-session`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",

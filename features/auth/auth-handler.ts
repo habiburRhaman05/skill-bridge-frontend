@@ -55,15 +55,17 @@ return userData.user
    setUserData(user)
    
   };
+
   // --- Get user profile ---
   const logoutCurrentUser = async () => {
  
   setStatus("logout-user")
-     const {success} = await logoutUser();
+     const res  = await logoutUser();
+   console.log(res);
    
-    if(success) {
-      router.push("/sign-in")
-    }
+    // if(success) {
+    //   router.push("/sign-in")
+    // }
    
    
   };

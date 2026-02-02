@@ -30,23 +30,10 @@ interface DashboardData {
 
 export default function TutorDashboard() {
   const [data, setData] = useState<DashboardData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Simulation: Fetch data from your Controller/Server Action
-  useEffect(() => {
-    const loadDashboard = async () => {
-      try {
-        setIsLoading(true);
-     
-        const {data} = await getTutorDashboardData("3e77cee9-818f-4c3b-baf3-8cf6f801a8c9")
-        setData(data)
-        setIsLoading(false)
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    loadDashboard();
-  }, []);
+
 
   if (isLoading) return <DashboardSkeleton />;
 

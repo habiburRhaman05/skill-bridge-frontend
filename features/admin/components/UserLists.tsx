@@ -2,16 +2,31 @@
 
 import { AnimatePresence } from "framer-motion";
 import UserCard from "./UserCard";
+import { useEffect, useState } from "react";
+import { useApiQuery } from "@/hooks/useApiQuery";
+import { Loader2 } from "lucide-react";
 
 
-const UserLists = ({users}:{users:any}) => {
-  return (
-    <AnimatePresence mode="popLayout">
-                {users.map((user:any) => (
-                <UserCard user={user} key={user.id}/>
-                ))}
-              </AnimatePresence>
-  )
+const UserLists = () => {
+ 
+  const {data:user,isLoading} = useApiQuery<{
+    data:any
+  }>(["fetch-users"],"/api/admin/users")
+
+  
+if(isLoading){
+  return <tr className="w-full p-10 flex items-center justify-center">
+   Loading...
+  </tr>
 }
 
-export default UserLists
+  return (
+    <AnimatePresence mode="popLayout">
+                {user?.data?.map((user:any) => (
+         <UserCard user={user} key={user.id}/>
+                ))}
+              </AnimatePresence>
+  )
+}
+
+export default UserLists 

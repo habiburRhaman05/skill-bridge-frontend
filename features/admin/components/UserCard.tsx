@@ -15,6 +15,7 @@ import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { updateUserStatus } from "../services";
 import axios from "axios";
+import { useRefetchQueries } from "@/lib/react-query";
 
 const UserCard = ({ user }: { user: {
   id:string;
@@ -24,22 +25,25 @@ const UserCard = ({ user }: { user: {
   status:string;
   email:string;
 } }) => {
-console.log(user);
 
 
+  const {refetchQueries} = useRefetchQueries()
+
+const [status,setStatus] = useState(user.status)
   const updateStatusMutation = useMutation({
     mutationFn:(payload:{
       userId:string;
       body:{
         status:string
       }
-    })=> axios.patch(`http://localhost:5000/api/admin/users/${payload.userId}/status`,payload.body,{
+    })=> axios.patch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/users/${payload.userId}/status`,payload.body,{
       withCredentials:true
     }),
     onSuccess:(res)=>{
-      console.log(res);
-      
-      // toast.success(res.data)
+      refetchQueries("fetch-users")
+
+       setStatus(res.data.data.status)
+      toast.success(res.data.message)
     }
   })
   
@@ -88,7 +92,7 @@ console.log(user);
       <TableCell>
         <div className="relative flex items-center">
           <Select 
-            defaultValue={user.status} 
+            defaultValue={status} 
             disabled={updateStatusMutation.isPending}
             onValueChange={handleStatusChange}
           >
@@ -97,19 +101,12 @@ console.log(user);
               user.status === "ACTIVE" ? "bg-emerald-500/10 text-emerald-600" : "bg-rose-500/10 text-rose-600",
               updateStatusMutation.isSuccess && "bg-emerald-500 text-white" // Flash green on success
             )}>
-              {updateStatusMutation.isPending ? (
+              {updateStatusMutation.isPending ?
                 <div className="flex items-center gap-2">
                   <Loader2 className="h-3 w-3 animate-spin" />
                   <span>Syncing...</span>
-                </div>
-              ) : updateStatusMutation.isSuccess ? (
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="h-3 w-3" />
-                  <span>Updated</span>
-                </div>
-              ) : (
-                <SelectValue />
-              )}
+                </div> : <SelectValue/>
+              }
             </SelectTrigger>
             
             <SelectContent className="rounded-2xl border-zinc-100 dark:border-zinc-800 p-1.5 shadow-2xl">

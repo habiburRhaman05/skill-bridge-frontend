@@ -24,13 +24,17 @@ export const BookingCard = ({ booking }: { booking: any }) => {
  
    const updateCategoryMutation = useMutation({
     mutationFn: ({ status }: {  status:string }) => 
-      axios.patch(`http://localhost:5000/api/booking/${id}/cancel-booking`, status, { withCredentials: true }),
+      axios.patch(`http://localhost:5000/api/booking/${id}/cancel-booking`, {status}, { withCredentials: true }),
     onSuccess: () => {
      
        toast.success("Booking cancelled", { id });
     
     },
-    onError: () => toast.error("Failed to cancel booking"),
+    onError: (e) => {
+      toast.error("Failed to cancel booking")
+console.log("e",e);
+
+    },
   });
 
   

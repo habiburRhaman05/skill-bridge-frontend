@@ -28,6 +28,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { useApiQuery } from "@/hooks/useApiQuery";
+import { useApiMutation } from "@/hooks/useApiMutation";
 
 
 const onboardingSchema = z.object({
@@ -43,14 +44,9 @@ const onboardingSchema = z.object({
 
 const TutorOnboarding = () => {
   const router  = useRouter()
-  const handleOnboarding = useMutation({
-    mutationFn: tutorOnboardingHandler,
-    onSuccess: (res) => {
-      console.log(res);
-      toast.success(res.message || "Profile completed successfully");
-   router.push("/tutor/dashboard/profile")
-    },
-    onError: () => toast.error("Failed to completing profile")
+  const handleOnboarding = useApiMutation({
+   method:"POST",
+   endpoint:"/api/tutor/profile"
   });
 
   const {data:categories,isLoading,isSuccess} = useApiQuery<{

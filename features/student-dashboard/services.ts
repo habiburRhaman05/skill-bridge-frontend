@@ -10,7 +10,7 @@ export  async function getToken() {
 
     if (!token) return null;
 
-    return token.value;
+    return token.value
   };
 
 export   async function getDashboardStats() {
@@ -178,7 +178,7 @@ try {
 
   const result = await response.json();
   // if (!response.ok) throw new Error(result.message || "Failed to fetch booking details");
-  revalidatePath(`/dashboard/bookings/9d703790-1ab6-41a4-bd86-e92e8ca06c43`)
+  revalidatePath(`/dashboard/bookings/${payload.bookingId}`)
   return result;
 } catch (error) {
   console.log("error",error);

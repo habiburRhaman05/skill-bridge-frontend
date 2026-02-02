@@ -1,54 +1,88 @@
+
+
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Card,CardAction,CardContent,CardFooter,CardHeader,CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Clock, GraduationCap } from 'lucide-react'
+import { Clock, GraduationCap, CalendarDays, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import React from 'react'
+import { getStudentBookings } from '../services'
 
 const UpCommingSessions = async () => {
+  const { data } = await getStudentBookings();
+  const upCommingSessions = data?.slice(0, 3) || [];
 
-    await new Promise((res)=> setTimeout(res,2000))
   return (
-   
-         <Card className="lg:col-span-4 shadow-sm border-zinc-200/60 dark:border-zinc-800/60">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-lg font-semibold flex items-center gap-2">
-              <Clock className="h-5 w-5 text-indigo-500" /> Upcoming Session
-            </CardTitle>
-            <Button variant="ghost" size="sm" asChild>
-              <Link href="/dashboard/bookings">View All</Link>
-            </Button>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center gap-4 p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50">
-              <Avatar className="h-12 w-12 border">
-                <AvatarImage src="https://github.com/shadcn.png" />
-                <AvatarFallback>SJ</AvatarFallback>
-              </Avatar>
-              <div className="flex-1">
-                <h4 className="font-semibold">Dr. Sarah Johnson</h4>
-                <p className="text-xs text-zinc-500 flex items-center gap-1">
-                  <GraduationCap className="h-3 w-3" /> Advanced React Patterns
-                </p>
+    <Card className="lg:col-span-4 overflow-hidden border-zinc-200/60 dark:border-zinc-800/60 shadow-sm rounded-[24px]">
+      <CardHeader className="flex flex-row items-center justify-between pb-2">
+        <CardTitle className="text-xl font-black tracking-tight flex items-center gap-2">
+          <div className="p-2 bg-indigo-500/10 rounded-lg">
+            <CalendarDays className="h-5 w-5 text-indigo-500" />
+          </div>
+          Upcoming Sessions
+        </CardTitle>
+        <Button variant="ghost" size="sm" asChild className="text-zinc-500 font-bold hover:text-indigo-600">
+          <Link href="/dashboard/bookings" className="flex items-center gap-1">
+            View All <ArrowRight className="h-4 w-4" />
+          </Link>
+        </Button>
+      </CardHeader>
+
+      <CardContent className="space-y-3 pt-4">
+        {upCommingSessions.length > 0 ? (
+          upCommingSessions.map((session: any) => (
+            <div 
+              key={session.id} 
+              className="group flex items-center justify-between p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 border border-transparent hover:border-indigo-500/20 hover:bg-white dark:hover:bg-zinc-900 transition-all duration-300"
+            >
+              <div className="flex items-center gap-4">
+                <div className="relative">
+                  <Avatar className="h-12 w-12 border-2 border-white dark:border-zinc-800 shadow-sm">
+                    <AvatarImage src={session.tutor.profileAvater || ""} />
+                    <AvatarFallback className="bg-indigo-100 text-indigo-600 font-bold">
+                      {session.tutor.user.name.charAt(0)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-emerald-500 border-2 border-white dark:border-zinc-900" />
+                </div>
+                
+                <div>
+                  <h4 className="font-bold text-zinc-900 dark:text-zinc-100 leading-none mb-1">
+                    {session.tutor.user.name}
+                  </h4>
+                  <div className="flex items-center gap-2">
+                    <p className="text-xs text-zinc-500 font-medium flex items-center gap-1">
+                      <GraduationCap className="h-3 w-3" /> 
+                      {session.tutor.category}
+                    </p>
+                    <span className="text-zinc-300 text-[10px]">•</span>
+                    <p className="text-[10px] font-black uppercase text-indigo-500 tracking-wider">
+                      {session.status}
+                    </p>
+                  </div>
+                </div>
               </div>
-              <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border-none">
-                Confirmed
-              </Badge>
+
+              <Button 
+                variant="secondary" 
+                size="sm" 
+                asChild 
+                className="rounded-xl font-bold px-4 hover:bg-indigo-600 hover:text-white transition-colors"
+              >
+                <Link href={`/dashboard/bookings/${session.id}`}>Details</Link>
+              </Button>
             </div>
-            <Button className="w-full bg-indigo-600 hover:bg-indigo-700 shadow-indigo-200 dark:shadow-none">
-              Join Zoom Meeting
-            </Button>
-          </CardContent>
-        </Card>
-  
+          ))
+        ) : (
+          <div className="py-8 text-center">
+            <p className="text-sm text-zinc-500 font-medium">No upcoming sessions</p>
+          </div>
+        )}
+      </CardContent>
+    </Card>
   )
 }
 
-export default UpCommingSessions
-
-export const UpCommingSessionsSkelection = ()=>{
-  return     <Skeleton className="h-64  col-span-4" />
-    
-}
+export default UpCommingSessions;

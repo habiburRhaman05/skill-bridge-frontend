@@ -15,30 +15,16 @@ import { EmptyState } from "./EmptyState";
 import { Booking } from "../types";
 
 
-const DUMMY_BOOKINGS: Booking[] = [
-  { id: "1", tutorName: "Dr. Sarah Johnson", subject: "Quantum Physics", date: "2026-02-15", time: "10:00 AM", status: "confirmed", avatar: "https://i.pravatar.cc/150?u=1", amount: "$45" },
-  { id: "2", tutorName: "Prof. Alan Turing", subject: "Cryptography", date: "2026-01-10", time: "02:30 PM", status: "completed", avatar: "https://i.pravatar.cc/150?u=2", amount: "$60" },
-  { id: "3", tutorName: "Maria Garcia", subject: "Spanish Language", date: "2026-02-20", time: "05:00 PM", status: "confirmed", avatar: "https://i.pravatar.cc/150?u=3", amount: "$30" },
-  { id: "4", tutorName: "James Wilson", subject: "Web Development", date: "2025-12-05", time: "11:00 AM", status: "cancelled", avatar: "https://i.pravatar.cc/150?u=4", amount: "$50" },
-];
 
 export default function StudentBookings({data}:{data:any}) {
   const [isLoading, setIsLoading] = useState(true);
-  const [filterStatus, setFilterStatus] = useState("all");
-  const [sortOrder, setSortOrder] = useState("latest");
-
+  
   useEffect(() => {
     const t = setTimeout(() => setIsLoading(false), 1500);
     return () => clearTimeout(t);
   }, []);
 
-  const filtered = DUMMY_BOOKINGS
-    .filter(b => filterStatus === "all" || b.status === filterStatus)
-    .sort((a, b) => {
-      const da = new Date(a.date).getTime();
-      const db = new Date(b.date).getTime();
-      return sortOrder === "latest" ? db - da : da - db;
-    });
+
 
   return (
     <div className="p-4 md:p-8 max-w-6xl mx-auto space-y-6">

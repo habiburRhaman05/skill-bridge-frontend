@@ -11,6 +11,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { StudentBooking } from "@/features/tutor/types";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { updateSessionStatus } from "../services";
+import { toast } from "sonner";
 
 // Helper for date formatting
 const formatDate = (dateStr: string) => {
@@ -23,11 +26,30 @@ const formatDate = (dateStr: string) => {
 
 interface BookingCardProps {
   session: StudentBooking;
-  onUpdateStatus: (tutorId: string, sessionId: string, status: string) => void;
-  isPending: boolean;
+
 }
 
-export function BookingCard({ session, onUpdateStatus, isPending }: BookingCardProps) {
+export function BookingCard({ session }: BookingCardProps) {
+    const queryClient = useQueryClient();
+
+  const sessionStatusMutation = useMutation({
+    mutationFn: updateSessionStatus,
+    onSuccess: (res) => {
+      toast.success(`Session marked as ${res.data.status.toLowerCase()}`);
+      queryClient.invalidateQueries({ queryKey: ["tutor-bookings"] });
+    },
+    onError: (error: any) => {
+      toast.error(error?.message || "Failed to update session status");
+    }
+  });
+
+  const handleSessionStatus = async (tutorId: string, sessionId: string, status: string) => {
+    const payload = {
+      body: { tutorId, status },
+      sessionId
+    };
+    await sessionStatusMutation.mutateAsync(payload);
+  };
   return (
     <motion.div
       layout
@@ -86,18 +108,18 @@ export function BookingCard({ session, onUpdateStatus, isPending }: BookingCardP
                   size="sm"
                   variant="outline"
                   className="rounded-xl text-xs font-bold border-red-100 text-red-600 hover:bg-red-50 dark:border-red-900/30 dark:hover:bg-red-900/20"
-                  onClick={() => onUpdateStatus(session.tutor.id, session.id, "CANCELLED")}
-                  disabled={isPending}
+                  onClick={() => handleSessionStatus(session.tutor.id, session.id, "CANCELLED")}
+                  disabled={sessionStatusMutation.isPending}
                 >
                   Cancel
                 </Button>
                 <Button
                   size="sm"
                   className="rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600"
-                  onClick={() => onUpdateStatus(session.tutor.id, session.id, "COMPLETED")}
-                  disabled={isPending}
+                  onClick={() => handleSessionStatus(session.tutor.id, session.id, "COMPLETED")}
+                  disabled={sessionStatusMutation.isPending}
                 >
-                  {isPending ? (
+                  {sessionStatusMutation.isPending ? (
                     <Loader2 className="w-3 h-3 animate-spin mr-2" />
                   ) : (
                     <CheckCircle2 className="w-3 h-3 mr-2" />

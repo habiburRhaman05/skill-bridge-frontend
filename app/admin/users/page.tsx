@@ -1,22 +1,14 @@
+
 import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { getAllUsersByAdmin } from "@/features/admin/services";
+
 import UserLists from "@/features/admin/components/UserLists";
 
-const MOCK_USERS = [
-  { id: "1", name: "Tanvir Ahmed", email: "tanvir@example.com", role: "Tutor", status: "active" },
-  { id: "2", name: "Jessica Smith", email: "jess@example.com", role: "Student", status: "active" },
-  { id: "3", name: "Rahat Kabir", email: "rahat@example.com", role: "Tutor", status: "banned" },
-  { id: "4", name: "Ayesha Malik", email: "ayesha@example.com", role: "Student", status: "active" },
-  { id: "5", name: "David Miller", email: "david@example.com", role: "Tutor", status: "active" },
-  { id: "6", name: "Sophie Chen", email: "sophie@example.com", role: "Student", status: "active" },
-  { id: "7", name: "Marcus Thorne", email: "marcus@example.com", role: "Tutor", status: "banned" },
-];
 
-const UserManagement = async() => {
+
+
+const UserManagement = () => {
  
-  const {data} = await getAllUsersByAdmin();
-  console.log(data);
-  
+
 
   return (
     <div className="p-8 max-w-7xl mx-auto space-y-8 font-sans antialiased">
@@ -46,7 +38,7 @@ const UserManagement = async() => {
               </TableRow>
             </TableHeader>
             <TableBody>
-             <UserLists users={data}/>
+             <UserLists/>
             </TableBody>
           </Table>
         </div>

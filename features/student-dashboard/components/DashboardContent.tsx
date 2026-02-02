@@ -6,7 +6,7 @@ import { Suspense } from "react";
 
 import LatestReviews from "./LatestReviews";
 import StudentStats, { StudentStatsSkelection } from "./StudentStats";
-import UpCommingSessions, { UpCommingSessionsSkelection } from "./UpCommingSessions";
+import UpCommingSessions from "./UpCommingSessions";
 import UserWelcome from "./UserWelcome";
 
 
@@ -25,17 +25,15 @@ name={data.name}
         <StudentStats/>
 
     </Suspense>
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
+      <div className="grid gap-6 ">
         {/* Booking Card */}
-    <Suspense fallback={<UpCommingSessionsSkelection/>}>
+
    <UpCommingSessions/>
-    </Suspense>
+ 
 
-        {/* Review Card */}
+     
 
-        <Suspense fallback={<UpCommingSessionsSkelection/>}>
-    <LatestReviews/>
-    </Suspense>
+       
       </div>
     </div>
   );

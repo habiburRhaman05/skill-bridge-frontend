@@ -57,7 +57,7 @@ const CategoryManager = () => {
   // --- Mutations ---
   const createCategoryMutation = useMutation({
     mutationFn: (payload: { name: string; subjects: string[] }) => 
-      axios.post("http://localhost:5000/api/admin/categories", payload, { withCredentials: true }),
+      axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/categories`, payload, { withCredentials: true }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["fetch-categories"] });
       toast.success("Category created successfully");
@@ -69,19 +69,23 @@ const CategoryManager = () => {
 
   const updateCategoryMutation = useMutation({
     mutationFn: ({ id, payload }: { id: string; payload: { name: string; subjects: string[] } }) => 
-      axios.patch(`http://localhost:5000/api/admin/categories/${id}`, payload, { withCredentials: true }),
+      axios.patch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/categories/${id}`, payload, { withCredentials: true }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["fetch-categories"] });
       toast.success("Category updated successfully");
       setIsModalOpen(false);
       resetForm();
     },
-    onError: () => toast.error("Failed to update category"),
+    onError: (err) => {
+      console.log(err);
+      
+      toast.error("Failed to update category")
+    },
   });
 
   const deleteCategoryMutation = useMutation({
     mutationFn: (id: string) => 
-      axios.delete(`http://localhost:5000/api/admin/categories/${id}`, { withCredentials: true }),
+      axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/categories/${id}`, { withCredentials: true }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["fetch-categories"] });
       toast.success("Category deleted");
