@@ -7,19 +7,18 @@ import React from 'react'
 const StudentDashboardLayout = async({children}:{
     children:React.ReactNode
 }) => {
-   const {user} = await getProfile();
-console.log("user",user);
+   const res = await getProfile();
 
-
-   if(!user || user.error){
-    redirect("/sign-in")
-   }
-   if(user.data.role !== "STUDENT"){
+   // if(!user || user.error){
+   //  redirect("/sign-in")
+   // }
+   if(res.data.role !== "STUDENT"){
     redirect("/")
    }
 
   return (
     <main className='w-full '>
+        {JSON.stringify(res.data)}
 <Header/>
     <div className=' w-full flex'>
   <DashboardSidebar
