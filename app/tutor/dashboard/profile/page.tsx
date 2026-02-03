@@ -3,11 +3,12 @@ import TutorProfilePage from '@/features/tutor/components/ProfileDetails';
 import React from 'react'
 
 const TutorDashboardProfile = async () => {
-  const {user } = await getProfile();
+const userData = await getProfile();
+
 
   return (
     <div>
-      <TutorProfilePage tutor={user.data}/>
+      <TutorProfilePage tutor={userData?.user.data}/>
     </div>
   )
 }

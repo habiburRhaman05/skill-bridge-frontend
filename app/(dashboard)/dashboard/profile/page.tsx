@@ -4,9 +4,9 @@ import { getProfile } from "@/features/auth/services";
 import StudentProfileFrom from "@/features/student-dashboard/components/ProfileFrom";
 
 export default async function StudentProfilePage() {
-const {user} = await getProfile();
+const userData = await getProfile();
 
-  return <StudentProfileFrom userData={user.data}/>
+  return <StudentProfileFrom userData={userData?.user.data}/>
 }
 
 // --- Skeleton Loader ---

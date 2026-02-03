@@ -13,7 +13,7 @@ const StudentDashboardLayout = async({children}:{
    if(!userData){
     redirect("/sign-in")
    }
-   if(userData.user.data.role !== "STUDENT"){
+   if(userData?.user.data.role !== "STUDENT"){
     redirect("/")
    }
 

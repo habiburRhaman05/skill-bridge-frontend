@@ -12,9 +12,10 @@ import { Timer, Trash2 } from "lucide-react";
 
 export default async function AvailabilityPage() {
 
-  const {user} = await getProfile()
+  const userData = await getProfile();
 
-const slots = user?.data?.tutorProfile.availability
+
+const slots =  userData?.user?.data?.tutorProfile.availability
 
   return (
     <div className=" bg-[#FDFDFD] dark:bg-[#0c0c0f]  md:p-16 text-zinc-900 dark:text-zinc-50 font-sans tracking-tight">
