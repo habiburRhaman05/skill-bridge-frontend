@@ -9,24 +9,12 @@ const StudentDashboardLayout = async({children}:{
 }) => {
    const res = await getProfile();
 console.log(res)
-   // if(!user || user.error){
-   //  redirect("/sign-in")
-   // }
-   // if(res.data.role !== "STUDENT"){
-   //  redirect("/")
-   // }
 
   return (
     <main className='w-full '>
         {JSON.stringify(res)}
-<Header/>
     <div className=' w-full flex'>
-  {/* <DashboardSidebar
-      userRole={res.data.role}
-      /> */}
-        <div className=' w-full'>
-          {children}
-        </div>
+        hi mr 
     </div>
     </main>
   )
