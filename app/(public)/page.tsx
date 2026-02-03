@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import Categories from "@/features/landing-page/Categories";
 import FeaturedTutors from "@/features/landing-page/FeaturedTutors";
+import Link from "next/link";
 
 const LandingPage = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -41,15 +42,11 @@ const LandingPage = () => {
             </p>
            
             <div className="flex flex-col sm:flex-row gap-4 max-w-xl mx-auto lg:mx-0">
-              <div className="relative flex-1">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
-                <Input
-                  placeholder="Search subjects..."
-                  className="h-14 pl-12 rounded-2xl bg-muted border-none text-lg font-medium focus-visible:ring-2 focus-visible:ring-indigo-500/20"
-                />
-              </div>
+             
               <Button className="h-14 px-8 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-black text-lg shadow-lg shadow-indigo-500/20">
+               <Link href={'/tutors'}>
                 Find Tutors
+               </Link>
               </Button>
             </div>
           </motion.div>

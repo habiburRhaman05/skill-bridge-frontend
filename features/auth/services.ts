@@ -1,10 +1,10 @@
 "use server"
 import { cookies } from "next/headers";
   
-export const getProfile = async () => {
-  const cookieStore = cookies();
-console.log(cookieStore);
+export const getProfile = async ():Promise<{user:{data:any}} | null> => {
+ const cookieStore = await cookies();
 
+      console.log(cookieStore.toString());
   const res = await fetch(`${process.env.API_URL}/api/auth/me`, {
     headers: {
       cookie: cookieStore.toString(),
@@ -13,8 +13,17 @@ console.log(cookieStore);
   });
 
   if (!res.ok) return null;
+  const user = await res.json()
 
-  return res.json();
+ 
+  return {user}
+};
+export const getCookies = async ():Promise<string> => {
+ const cookieStore = await cookies();
+
+
+ 
+  return cookieStore.toString()
 };
 export const logoutUser = async ()=>{
   
@@ -35,4 +44,3 @@ export const logoutUser = async ()=>{
         
     }
 }
-

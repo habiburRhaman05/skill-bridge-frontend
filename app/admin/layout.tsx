@@ -8,14 +8,14 @@ import React from 'react'
 const TutorDashbaordLayout = async({children}:{
     children:React.ReactNode
 }) => {
-   const {user} = await getProfile();
-console.log("admin ",user);
+   const userData = await getProfile()
 
 
-   if(!user || user.error){
+
+   if(!userData){
     redirect("/sign-in")
    }
-   if(user.data.role !== "ADMIN"){
+   if(userData?.user.data.role !== "ADMIN"){
     redirect("/")
    }
 
@@ -26,7 +26,7 @@ console.log("admin ",user);
 <Header/>
     <div className=' w-full flex'>
   <DashboardSidebar
-      userRole={user.data.role}
+      userRole={userData?.user.data.role}
       />
 
         <div className=' w-full'>
