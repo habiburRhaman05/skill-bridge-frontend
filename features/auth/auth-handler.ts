@@ -62,11 +62,9 @@ return userData.user
  
   setStatus("logout-user")
      const res  = await logoutUser();
-   console.log(res);
+
    
-    // if(success) {
-    //   router.push("/sign-in")
-    // }
+
    
    
   };
