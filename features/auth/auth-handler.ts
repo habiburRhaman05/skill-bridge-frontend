@@ -45,14 +45,15 @@ return userData.user
   const getCurrentUser = async () => {
  
   setStatus("get-profile")
-     const {user} = await getProfile();
+   const userData = await getProfile();
+
     
 
-   if(!user){
+   if(!userData){
      setStatus("none")
      setUserData({})
    }
-   setUserData(user)
+   setUserData(userData?.user.data)
    
   };
 
