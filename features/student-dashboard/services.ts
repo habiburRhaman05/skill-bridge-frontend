@@ -14,36 +14,36 @@ export  async function getToken() {
   };
 
 export   async function getDashboardStats() {
-    const token = await getToken()
-    if (!token) return null;
-
+  
+try {
+   const cookieStore = await cookies();
     const res = await fetch(
       `${process.env.API_URL}/api/student/dashboard/stats`,
       {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+     headers: {
+      cookie: cookieStore.toString(),
+    },
       }
     );
+const data = await res.json()
+console.log(data);
+return {data}
 
-    if (!res.ok) return null;
-
-    return res.json();
+} catch (error) {
+  console.log("error",error);
+  
+}
   };
  export async function getStudentBookings() {
-    const cookieStore = cookies();
-    const token = (await cookieStore).get("token");
+ const cookieStore = await cookies();
 
-    if (!token) return null;
- console.log("token",token);
- 
     try {
           const res = await fetch(
       `${process.env.API_URL}/api/booking`,
       {
-        headers: {
-          Authorization: `Bearer ${token.value}`,
-        },
+         headers: {
+      cookie: cookieStore.toString(),
+    },
       }
     );
     return res.json();

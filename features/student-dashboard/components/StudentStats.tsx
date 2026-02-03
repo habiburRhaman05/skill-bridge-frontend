@@ -5,11 +5,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { getDashboardStats } from "../services";
 
 export default async function StudentStats() {
- const {data} = await getDashboardStats();
+ const response = await getDashboardStats();
  const statsData = [
-  { id: 1, name: "Total Bookings", value: data?.totalBooking,  icon: CalendarCheck, color: "text-blue-600", bg: "bg-blue-50 dark:bg-blue-900/20" },
+  { id: 1, name: "Total Bookings", value: response?.data?.totalBooking,  icon: CalendarCheck, color: "text-blue-600", bg: "bg-blue-50 dark:bg-blue-900/20" },
  
-  { id: 3, name: "Reviews Given", value: data?.totalReview , icon: Star, color: "text-amber-600", bg: "bg-amber-50 dark:bg-amber-900/20" },
+  { id: 3, name: "Reviews Given", value: response?.data?.totalReview , icon: Star, color: "text-amber-600", bg: "bg-amber-50 dark:bg-amber-900/20" },
 ];
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
