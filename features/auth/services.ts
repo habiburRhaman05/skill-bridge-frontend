@@ -10,6 +10,7 @@ export const getProfile = async ():Promise<{user:{data:any},cookies:string} | nu
       cookie: cookieStore.toString(),
     },
     cache: "no-store",
+      credentials: "include",
   });
 
   if (!res.ok) return null;

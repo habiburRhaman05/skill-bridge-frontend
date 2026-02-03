@@ -26,9 +26,16 @@ export const useAuthHandlers = () => {
   })
   // --- Sign In ---
   const signIn = async (data: signInPayloadType) => {
- 
-    const userData =  await signinMutation.mutateAsync(data);
-return userData.user
+    // const userData =  await signinMutation.mutateAsync(data);
+   const res = fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify(data),
+  credentials: "include", // 🔥 REQUIRED
+});
+const userData = (await res).json()
+
+return userData
 
   };
 
@@ -64,7 +71,7 @@ return userData.user
      const res  = await logoutUser();
 
    
-
+  
    
    
   };

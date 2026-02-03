@@ -29,7 +29,8 @@ const router = useRouter()
       onChange: signInSchema,
     },
     onSubmit: async ({ value }) => {
-     const user = await signIn(value);
+     const {user} = await signIn(value);
+
        if(user && user.role === "TUTOR"){
       router.push("/tutor/dashboard")
      }else if(user && user.role === "STUDENT"){
