@@ -18,9 +18,9 @@ export async function getProfile() {
     cache: "no-store",
   });
 
-  if (!res.ok) return null;
+  // if (!res.ok) return null;
 
-  return res.json();
+  return cookieHeader
 }
 
 /* =========================
