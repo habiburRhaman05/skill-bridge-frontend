@@ -1,5 +1,3 @@
-
-
 "use server";
 
 import { headers } from "next/headers";
@@ -9,7 +7,7 @@ const API_URL = process.env.API_URL;
 // ✅ Get current user profile
 export const getProfile = async () => {
   try {
-    const incomingHeaders = await headers(); // forwards all headers including cookies
+    const incomingHeaders = headers(); // forwards all headers including cookies
 
     const res = await fetch(`${API_URL}/api/auth/me`, {
       headers: incomingHeaders,
@@ -27,7 +25,7 @@ export const getProfile = async () => {
 // ✅ Logout user
 export const logoutUser = async () => {
   try {
-    const incomingHeaders = await headers();
+    const incomingHeaders = headers();
 
     const res = await fetch(`${API_URL}/api/auth/logout`, {
       method: "POST",
