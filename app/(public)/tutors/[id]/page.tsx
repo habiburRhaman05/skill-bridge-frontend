@@ -4,13 +4,14 @@ import React from 'react'
 
 const page =async ({params}:{params:{id:string}}) => {
   const {id} = await params;
-  const {user} = await getProfile();
+const userData = await getProfile();
+
 ``
   const res = await fetch(`${process.env.API_URL}/api/tutors/${id}`);
   const {data} = await res.json();
   const userInfo = {
-   role:user?.data?.role || "GUEST",
-        id:user?.data?.id || "NULL" 
+   role:userData?.user?.data?.role || "GUEST",
+        id:userData?.user?.data?.id || "NULL" 
   }
   
   return (
