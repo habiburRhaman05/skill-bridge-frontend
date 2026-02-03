@@ -8,13 +8,12 @@ const LogoutButton = () => {
     try {
       setLoading(true);
 
-      await fetch("http://localhost:5000/api/auth/logout", {
-        method: "POST",
-        credentials: "include", // 🔥 COOKIE পাঠানোর জন্য MUST
-      });
+   await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/logout`, {
+    method: "POST",
+    credentials: "include",
+  });
 
-      // optional: frontend state reset / redirect
-      window.location.href = "/sign-in"; // বা router.push("/login")
+  window.location.href = "/sign-in";
     } catch (err) {
       console.error("Logout failed", err);
     } finally {
