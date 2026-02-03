@@ -6,14 +6,12 @@ import DashboardContent from "@/features/student-dashboard/components/DashboardC
 
 export default async function StudentOverview() {
  
-  const {user} = await getProfile();
+  const res = await getProfile();
   
-  const propsData ={
-    name: user.data.name,
-  }
 
-  return <DashboardContent data={
-   propsData
-  }/>
+
+  return <div>
+   {JSON.stringify(res)}
+  </div>
 }
 
