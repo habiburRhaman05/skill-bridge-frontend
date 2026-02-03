@@ -1,186 +1,169 @@
-"use server"
+"use server";
+
 import { cookies } from "next/headers";
 import { updateProfilePayload } from "./types";
 import { revalidatePath } from "next/cache";
 
+export async function getToken() {
+  const cookieStore = await cookies();
 
-export  async function getToken() {
-    const cookieStore = cookies();
-    const token = (await cookieStore).get("token");
-
-    if (!token) return null;
-
-    return token.value
-  };
-
-export   async function getDashboardStats() {
-  
-try {
-   const cookieStore = await cookies();
-    const res = await fetch(
-      `${process.env.API_URL}/api/student/dashboard/stats`,
-      {
-     headers: {
-      cookie: cookieStore.toString(),
-    },
-      }
-    );
-const data = await res.json()
-console.log(data);
-return {data}
-
-} catch (error) {
-  console.log("error",error);
-  
+  return cookieStore.toString();
 }
-  };
- export async function getStudentBookings() {
- const cookieStore = await cookies();
 
-    try {
-          const res = await fetch(
-      `${process.env.API_URL}/api/booking`,
-      {
-         headers: {
-      cookie: cookieStore.toString(),
-    },
-      }
-    );
-    return res.json();
-    } catch (error) {
-        console.log("error",error);
-        
-    }
-
-  };
-
-
- export  async function  updateProfile (formData:updateProfilePayload){
-   try {
-    console.log("start update profile");
-    
-     const cookieStore = cookies();
-  const token =  (await cookieStore).get("token")?.value;
-
-  const res = await fetch(`${process.env.API_URL}/api/student/profile`, {
-    method:"PUT", // or POST depending on your API
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify(formData),
-  });
-
-  const result = await res.json();
-
-
-
-  // Refresh the Next.js cache
-  revalidatePath("/dashboard/profile");
-  return result;
-   } catch (error) {
-    console.log("error",error);
-    
-    return {error:"somethink went wrong"}
-   }
+export async function getDashboardStats() {
+  try {
+    const token = await getToken();
+    const res = await fetch(`${process.env.API_URL}/api/student/dashboard/stats`, {
+      headers: { cookie: token },
+    });
+    const data = await res.json();
+    return { data };
+  } catch (error) {
+    console.error("getDashboardStats error:", error);
+    return { error: "Failed to fetch dashboard stats" };
   }
+}
+
+export async function getStudentBookings() {
+  try {
+    const token = await getToken();
+    const res = await fetch(`${process.env.API_URL}/api/booking`, {
+      headers: { cookie: token },
+    });
+    return await res.json();
+  } catch (error) {
+    console.error("getStudentBookings error:", error);
+    return { error: "Failed to fetch bookings" };
+  }
+}
+
+export async function updateProfile(formData: updateProfilePayload) {
+  try {
+    const token = await getToken();
+    const res = await fetch(`${process.env.API_URL}/api/student/profile`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        cookie: token,
+      },
+      body: JSON.stringify(formData),
+    });
+
+    const result = await res.json();
+    revalidatePath("/dashboard/profile");
+    return result;
+  } catch (error) {
+    console.error("updateProfile error:", error);
+    return { error: "Something went wrong while updating profile" };
+  }
+}
 
 export const updateAvatar = async (file: File) => {
-try {
+  try {
     const formData = new FormData();
-  formData.append("profileAvatar", file);
-  const cookieStore = cookies();
-  const token =  (await cookieStore).get("token")?.value;
-console.log("fromdata",formData);
+    formData.append("profileAvatar", file);
+    
+    const token = await getToken();
 
-  const response = await fetch(`${process.env.API_URL}/api/student/profile/avater-change`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: formData,
-     // Browser automatically sets Content-Type to multipart/form-data
-  });
+    const response = await fetch(`${process.env.API_URL}/api/student/profile/avater-change`, {
+      method: "POST",
+      headers: {
+        // IMPORTANT: Do not set Content-Type for FormData; 
+        // the system needs to generate the boundary automatically.
+        cookie: token,
+      },
+      body: formData,
+    });
 
-  
-  return response.json();
-} catch (error) {
-  console.log("erro",error);
-  
-}
+    const result = await response.json();
+    revalidatePath("/dashboard/profile");
+    return result;
+  } catch (error) {
+    console.error("updateAvatar error:", error);
+    return { error: "Failed to update avatar" };
+  }
 };
 
 export const changePassword = async (data: any) => {
-  const cookieStore = cookies();
-  const token =  (await cookieStore).get("token")?.value;
-  const response = await fetch(`${process.env.API_URL}/api/auth/change-password`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify(data),
-  });
+  try {
+    const token = await getToken();
+    const response = await fetch(`${process.env.API_URL}/api/auth/change-password`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        cookie: token,
+      },
+      body: JSON.stringify(data),
+    });
 
-  const result = await response.json();
-  if (!response.ok) throw new Error(result.message || "Failed to update password");
-  return result;
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || "Failed to update password");
+    return result;
+  } catch (error) {
+    console.error("changePassword error:", error);
+    throw error;
+  }
 };
+
 export const createBooking = async (data: any) => {
+  try {
+    const token = await getToken();
+    const response = await fetch(`${process.env.API_URL}/api/booking`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        cookie: token,
+      },
+      body: JSON.stringify(data),
+    });
 
-   const token = await getToken()
-  const response = await fetch(`${process.env.API_URL}/api/booking`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify(data),
-  });
-
-  const result = await response.json();
-  if (!response.ok) throw new Error(result.message || "Failed to create booking");
-  revalidatePath(`/tutors/${data.tutorId}`)
-  return result;
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || "Failed to create booking");
+    
+    revalidatePath(`/tutors/${data.tutorId}`);
+    revalidatePath("/dashboard/bookings");
+    return result;
+  } catch (error) {
+    console.error("createBooking error:", error);
+    throw error;
+  }
 };
-export const getBookingDetails = async (bookingId:string) => {
-try {
-   const token = await getToken()
-  const response = await fetch(`${process.env.API_URL}/api/booking/${bookingId}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    }
-  });
 
-  const result = await response.json();
-  // if (!response.ok) throw new Error(result.message || "Failed to fetch booking details");
-  return result;
-} catch (error) {
-  console.log("error",error);
-  
-}
+export const getBookingDetails = async (bookingId: string) => {
+  try {
+    const token = await getToken();
+    const response = await fetch(`${process.env.API_URL}/api/booking/${bookingId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        cookie: token,
+      },
+    });
+
+    return await response.json();
+  } catch (error) {
+    console.error("getBookingDetails error:", error);
+    return { error: "Failed to fetch booking details" };
+  }
 };
-export const createReview = async (payload:any) => {
-try {
-   const token = await getToken()
-  const response = await fetch(`${process.env.API_URL}/api/review`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-      
-    },
-    body:JSON.stringify(payload)
-  });
 
-  const result = await response.json();
-  // if (!response.ok) throw new Error(result.message || "Failed to fetch booking details");
-  revalidatePath(`/dashboard/bookings/${payload.bookingId}`)
-  return result;
-} catch (error) {
-  console.log("error",error);
-}
+export const createReview = async (payload: any) => {
+  try {
+    const token = await getToken();
+    const response = await fetch(`${process.env.API_URL}/api/review`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        cookie: token,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const result = await response.json();
+    revalidatePath(`/dashboard/bookings/${payload.bookingId}`);
+    return result;
+  } catch (error) {
+    console.error("createReview error:", error);
+    return { error: "Failed to submit review" };
+  }
 };

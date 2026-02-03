@@ -34,6 +34,7 @@ const Categories = () => {
 
   const categoryList = categories?.data || [];
 
+
   return (
     <section className="py-24 bg-muted/30 dark:bg-zinc-950/50">
       <div className="max-w-7xl mx-auto px-6">

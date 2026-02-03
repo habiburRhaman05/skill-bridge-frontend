@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import { updateUserStatus } from "../services";
 import axios from "axios";
 import { useRefetchQueries } from "@/lib/react-query";
+import { useApiMutation } from "@/hooks/useApiMutation";
 
 const UserCard = ({ user }: { user: {
   id:string;
@@ -30,22 +31,29 @@ const UserCard = ({ user }: { user: {
   const {refetchQueries} = useRefetchQueries()
 
 const [status,setStatus] = useState(user.status)
-  const updateStatusMutation = useMutation({
-    mutationFn:(payload:{
-      userId:string;
-      body:{
-        status:string
-      }
-    })=> axios.patch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/users/${payload.userId}/status`,payload.body,{
-      withCredentials:true
-    }),
-    onSuccess:(res)=>{
-      refetchQueries("fetch-users")
-
-       setStatus(res.data.data.status)
-      toast.success(res.data.message)
-    }
+  const updateStatusMutation =  useApiMutation({
+    method:"PATCH",
+    endpoint:`/api/admin/users/${user.id}/status`,
+    
   })
+  
+  
+  // useMutation({
+  //   mutationFn:(payload:{
+  //     userId:string;
+  //     body:{
+  //       status:string
+  //     }
+  //   })=> axios.patch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/users/${payload.userId}/status`,payload.body,{
+  //     withCredentials:true
+  //   }),
+  //   onSuccess:(res)=>{
+  //     refetchQueries("fetch-users")
+
+  //      setStatus(res.data.data.status)
+  //     toast.success(res.data.message)
+  //   }
+  // })
   
 
   const handleStatusChange = async(val: string) => {

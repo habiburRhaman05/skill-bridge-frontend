@@ -1,6 +1,7 @@
-
 import {
   CreditCard,
+  LayoutDashboard,
+  LifeBuoy,
   Loader2,
   Settings,
   User,
@@ -22,42 +23,63 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from '@/components/ui/button';
 import LogoutButton from './logoutButton';
 
+interface UserData {
+  name: string;
+  email: string;
+  role: "ADMIN" | "TUTOR" | "STUDENT";
+  profileAvater?: string;
+}
+
 type Props = {
-  data:{
-    user:any,
-    isLoading:boolean;
-    isError:boolean;
+  data: {
+    user: UserData | null;
+    isLoading: boolean;
+    isError: boolean;
   }
 }
 
-const ProfileAvater = ({data}:Props) => {
- 
+const ProfileAvatar = ({ data }: Props) => {
+  const { user, isLoading, isError } = data;
+
+  // Helper to determine dashboard link based on role
+  const getDashboardHref = () => {
+    if (user?.role === "ADMIN") return "/admin";
+    if (user?.role === "TUTOR") return "/tutor/dashboard";
+    return "/dashboard";
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex h-9 w-9 items-center justify-center">
+        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  if (!user || isError) {
+    return (
+      <Button 
+        asChild
+        variant="outline" 
+        className="group h-9 rounded-full border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-all duration-300"
+      >
+        <Link href="/sign-in" className="flex items-center gap-2">
+          <User2 className="h-4 w-4" />
+          <span className="text-sm font-medium">Sign In</span>
+          <span className="opacity-50 group-hover:translate-x-1 transition-transform duration-300">→</span>
+        </Link>
+      </Button>
+    );
+  }
+
   return (
- <>
- {data.isLoading ? <div>
-  <Loader2 className='animate-spin'/>
- </div> : !data.user || data.isError ? (
-   <Link href="/sign-in">
-    <Button 
-    asChild
-      variant="outline" 
-      className="group relative h-9 px-5 rounded-full border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-all duration-300"
-    >
-      <span className="relative z-10 flex items-center gap-2 text-sm font-medium">
-     <User2/>
-        Sign In
-        <span className="opacity-50 group-hover:translate-x-1 transition-transform duration-300">→</span>
-      </span>
-    </Button>
-  </Link> 
-  ) : (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="outline-none ml-2">
+        <button className="outline-none ml-2 focus-visible:ring-2 focus-visible:ring-indigo-500 rounded-full transition-all">
           <Avatar className="h-9 w-9 border-2 border-transparent hover:border-indigo-500 transition-all cursor-pointer shadow-sm">
-            <AvatarImage src={data.user.profileAvater} alt={data.user.name} />
+            <AvatarImage src={user.profileAvater} alt={user.name} />
             <AvatarFallback className="bg-indigo-100 text-indigo-700 font-bold">
-              {data.user.name?.charAt(0) || "U"}
+              {user.name?.charAt(0) || "U"}
             </AvatarFallback>
           </Avatar>
         </button>
@@ -66,35 +88,61 @@ const ProfileAvater = ({data}:Props) => {
       <DropdownMenuContent className="w-64 p-2 mt-2" align="end" sideOffset={8}>
         <DropdownMenuLabel className="font-normal p-3">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-bold leading-none text-zinc-900 dark:text-zinc-100">{data.user.name}</p>
-            <p className="text-xs leading-none text-zinc-500 dark:text-zinc-400 mt-1 italic">{data.user.email}</p>
+            <p className="text-sm font-bold leading-none text-zinc-900 dark:text-zinc-100">{user.name}</p>
+            <p className="text-xs leading-none text-zinc-500 dark:text-zinc-400 mt-1 truncate">{user.email}</p>
           </div>
         </DropdownMenuLabel>
         
         <DropdownMenuSeparator />
         
         <DropdownMenuGroup>
-          {/* Profile Settings */}
           <DropdownMenuItem asChild className="cursor-pointer py-2.5 rounded-lg focus:bg-indigo-50 dark:focus:bg-indigo-950/30">
-            <Link href={data.user.role === "ADMIN" ? "/admin" : data.user.role === "TUTOR" ? "/tutor/dashboard" : "/dashboard"} className="flex w-full items-center">
-              <User className="mr-3 h-4 w-4 text-zinc-500" />
-              <span className="font-medium">View Dashboard</span>
+            <Link href={getDashboardHref()} className="flex w-full items-center">
+              <LayoutDashboard className="mr-3 h-4 w-4 text-zinc-500" />
+              <span className="font-medium">Dashboard</span>
             </Link>
           </DropdownMenuItem>
 
+          <DropdownMenuItem asChild className="cursor-pointer py-2.5 rounded-lg focus:bg-indigo-50 dark:focus:bg-indigo-950/30">
+            <Link href={`${getDashboardHref()}/profile`} className="flex w-full items-center">
+              <User className="mr-3 h-4 w-4 text-zinc-500" />
+              <span className="font-medium">Profile Settings</span>
+            </Link>
+          </DropdownMenuItem>
+
+          <DropdownMenuItem asChild className="cursor-pointer py-2.5 rounded-lg focus:bg-indigo-50 dark:focus:bg-indigo-950/30">
+            <Link href="/dashboard/billing" className="flex w-full items-center">
+              <CreditCard className="mr-3 h-4 w-4 text-zinc-500" />
+              <span className="font-medium">Billing</span>
+            </Link>
+          </DropdownMenuItem>
         </DropdownMenuGroup>
 
         <DropdownMenuSeparator />
 
-        {/* Logout */}
-        <DropdownMenuItem className="cursor-pointer py-2.5 rounded-lg text-red-600 focus:bg-red-50 dark:focus:bg-red-800/30 focus:text-red-600">
-           <LogoutButton />
-        </DropdownMenuItem>
+        <DropdownMenuGroup>
+          <DropdownMenuItem asChild className="cursor-pointer py-2.5 rounded-lg">
+            <Link href="/settings" className="flex w-full items-center">
+              <Settings className="mr-3 h-4 w-4 text-zinc-500" />
+              <span className="font-medium">General Settings</span>
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild className="cursor-pointer py-2.5 rounded-lg">
+            <Link href="/support" className="flex w-full items-center">
+              <LifeBuoy className="mr-3 h-4 w-4 text-zinc-500" />
+              <span className="font-medium">Support</span>
+            </Link>
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+
+        <DropdownMenuSeparator />
+
+        <div className="pt-1">
+          <LogoutButton />
+        </div>
       </DropdownMenuContent>
     </DropdownMenu> 
-  )}
- </>
-  )
-}
+  );
+};
 
-export default ProfileAvater;
+export default ProfileAvatar;

@@ -1,18 +1,18 @@
 "use client"
 import {
-  LayoutGrid,
   Calendar,
-  User,
-  Shield,
-  Search,
-  Timer,
-  Star,
-  Users,
-  Shapes,
-  LogOut,
   GraduationCap,
   History,
-  Layout
+  Layout,
+  LayoutGrid,
+  LogOut,
+  Search,
+  Shapes,
+  Shield,
+  Star,
+  Timer,
+  User,
+  Users
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -20,17 +20,14 @@ import { usePathname } from "next/navigation";
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarGroup,
-  SidebarGroupContent,
   SidebarGroupLabel,
-  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
-  SidebarMenuItem,
-} from "@/components/ui/sidebar"
-import { cn } from "@/lib/utils"
-import { Button } from "../ui/button"
+  SidebarMenuItem
+} from "@/components/ui/sidebar";
+import { cn } from "@/lib/utils";
+import { Button } from "../ui/button";
 
 const studentItems = [
   { title: "Overview", href: "/dashboard", icon: LayoutGrid },
@@ -67,10 +64,14 @@ export function DashboardSidebar({userRole}:{userRole:"ADMIN" | "STUDENT" | "TUT
     "STUDENT":studentItems,
     "TUTOR":tutorItems,
   }
-  const isActive = (href: string) =>
-    href === "/dashboard"
-      ? pathname === "/dashboard"
-      : pathname.startsWith(href)
+const isActive = (href: string) => {
+    if (pathname === href) return true;
+    
+    // Check if the current pathname is a sub-route of the link, 
+    // but only if the link isn't the root dashboard itself.
+    const isRootPath = ["/dashboard", "/tutor/dashboard", "/admin"].includes(href);
+    return !isRootPath && pathname.startsWith(href + "/");
+  };
 
   const handleLogout = () => {
 // handle logout logic

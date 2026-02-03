@@ -1,58 +1,83 @@
-import { getToken } from "../student-dashboard/services"
+"use server";
 
-export const getAllUsersByAdmin = async ()=>{
-    const token = await getToken();
-  try {
-          const res = await fetch(
-      `${process.env.API_URL}/api/admin/users`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    return res.json();
-    } catch (error) {
-        console.log("error",error);
-        
-    }
-}
-export const updateUserStatus = async (payload:{userId:string,body:{status:string}})=>{
-    const token = await getToken();
+import { revalidatePath } from "next/cache";
+import { getToken } from "../student-dashboard/services";
 
-    
+/**
+ * Admin services updated to use the 'cookie' header for authentication.
+ */
+
+export const getAllUsersByAdmin = async () => {
   try {
-          const res = await fetch(
+    const cookieString = await getToken(); // Returns cookieStore.toString()
+    if (!cookieString) throw new Error("Unauthorized: No cookies found");
+
+    const res = await fetch(`${process.env.API_URL}/api/admin/users`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        cookie: cookieString, // Changed from Authorization to cookie
+      },
+      next: { revalidate: 0 },
+    });
+
+    return await res.json();
+  } catch (error) {
+    console.error("getAllUsersByAdmin error:", error);
+    return { error: "Could not retrieve users list" };
+  }
+};
+
+export const updateUserStatus = async (payload: { userId: string; body: { status: string } }) => {
+  try {
+    const cookieString = await getToken();
+    if (!cookieString) throw new Error("Unauthorized: No cookies found");
+
+    const res = await fetch(
       `${process.env.API_URL}/api/admin/users/${payload.userId}/status`,
       {
-        method:"POST",
+        method: "POST",
         headers: {
-          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+          cookie: cookieString, // Changed from Authorization to cookie
         },
-        body:JSON.stringify(payload.body)
+        body: JSON.stringify(payload.body),
       }
     );
-    return res.json();
-    } catch (error) {
-        console.log("error",error);
-        
-    }
-}
 
-export const getAllBookingsByAdmin = async ()=>{
-    const token = await getToken();
+    const result = await res.json();
+    
+    // Revalidate the users list so the admin sees the status change immediately
+    revalidatePath("/admin/dashboard/users");
+    
+    return result;
+  } catch (error) {
+    console.error("updateUserStatus error:", error);
+    return { error: "Failed to update user status" };
+  }
+};
+
+export const getAllBookingsByAdmin = async () => {
   try {
-          const res = await fetch(
-      `${process.env.API_URL}/api/admin/bookings`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    return res.json();
-    } catch (error) {
-        console.log("error",error);
-        
+    const cookieString = await getToken();
+    if (!cookieString) throw new Error("Unauthorized: No cookies found");
+
+    const res = await fetch(`${process.env.API_URL}/api/admin/bookings`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        cookie: cookieString, // Changed from Authorization to cookie
+      },
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData.message || "Failed to fetch bookings");
     }
-}
+
+    return await res.json();
+  } catch (error) {
+    console.error("getAllBookingsByAdmin error:", error);
+    return { error: "Could not retrieve bookings list" };
+  }
+};

@@ -28,14 +28,14 @@ export const getCookies = async ():Promise<string> => {
 };
 export const logoutUser = async ()=>{
   
-   const cookieStore = cookies();
-    const token =(await cookieStore).get("token")
+ const cookieStore = await cookies();
+
     try {
         const res = await fetch(`${process.env.API_URL}/api/auth/logout`,{
             credentials:"include",
-            headers:{
-                "Authorization":`Bearer ${token?.value}`
-            },
+            headers: {
+      cookie: cookieStore.toString(),
+    },
         });
         const data = await res.json()
         

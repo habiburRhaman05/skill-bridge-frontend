@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns"; // npm install date-fns
 import { getTutorDashboardData } from "@/features/tutor/services";
+import { useApiQuery } from "@/hooks/useApiQuery";
 
 // --- Types based on your API Output ---
 interface DashboardData {
@@ -33,7 +34,15 @@ export default function TutorDashboard() {
   const [isLoading, setIsLoading] = useState(false);
 
   // Simulation: Fetch data from your Controller/Server Action
-
+  const { data: categories } = useApiQuery<{
+    data: {
+      id: string;
+      name: string;
+      subjects: string[];
+    }[];
+  }>(["fetch-categories"], "/api/shared/categories", {
+    staleTime: 60000,
+  });
 
   if (isLoading) return <DashboardSkeleton />;
 

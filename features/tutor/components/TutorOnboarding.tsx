@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useForm } from "@tanstack/react-form";
 import { zodValidator } from "@tanstack/zod-form-adapter";
@@ -44,9 +44,17 @@ const onboardingSchema = z.object({
 
 const TutorOnboarding = () => {
   const router  = useRouter()
-  const handleOnboarding = useApiMutation({
-   method:"POST",
-   endpoint:"/api/tutor/profile"
+  const handleOnboarding = useMutation({
+mutationFn:tutorOnboardingHandler,
+onSuccess:(res)=>{
+  toast.success("Your Profile Completed")
+ router.refresh()
+},
+onError:(err)=>{
+  console.log(err);
+}
+
+
   });
 
   const {data:categories,isLoading,isSuccess} = useApiQuery<{
@@ -74,10 +82,15 @@ const TutorOnboarding = () => {
       console.log(value);
       
       await handleOnboarding.mutateAsync(value);
-      router.push("/tutor/dashboard")
+    
     },
   });
 
+  useEffect(()=>{
+   if(  handleOnboarding.isSuccess){
+        // router.push("/tutor/dashboard")
+    }
+  },[  handleOnboarding.isSuccess])
   return (
     <AnimatePresence>
       <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
