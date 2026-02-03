@@ -20,7 +20,10 @@ export async function getProfile() {
 
   // if (!res.ok) return null;
 
-  return cookieHeader
+  return {
+     user:{},
+     cookieHeader,
+  }
 }
 
 /* =========================
