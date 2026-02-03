@@ -19,15 +19,17 @@ const StudentDashboardLayout = async({children}:{
 
   return (
     <main className='w-full '>
-<Header/>
-    <div className=' w-full flex'>
+      {userData.cookies}
+      dashbaord
+{/* <Header/> */}
+    {/* <div className=' w-full flex'>
   <DashboardSidebar
       userRole={userData.user.data.role}
       />
         <div className=' w-full'>
           {children}
         </div>
-    </div>
+    </div> */}
     </main>
   )
 }

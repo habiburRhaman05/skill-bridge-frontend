@@ -1,7 +1,7 @@
 "use server"
 import { cookies } from "next/headers";
   
-export const getProfile = async ():Promise<{user:{data:any}} | null> => {
+export const getProfile = async ():Promise<{user:{data:any},cookies:string} | null> => {
  const cookieStore = await cookies();
 
       console.log(cookieStore.toString());
@@ -16,7 +16,7 @@ export const getProfile = async ():Promise<{user:{data:any}} | null> => {
   const user = await res.json()
 
  
-  return {user}
+  return {user,cookies:cookieStore.toString()}
 };
 export const getCookies = async ():Promise<string> => {
  const cookieStore = await cookies();
