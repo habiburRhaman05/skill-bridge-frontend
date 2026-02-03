@@ -20,6 +20,7 @@ const StudentDashboardLayout = async({children}:{
   return (
     <main className='w-full '>
       {userData?.cookies}
+      {JSON.stringify(userData?.user.data)}
       dashbaord
 {/* <Header/> */}
     {/* <div className=' w-full flex'>
