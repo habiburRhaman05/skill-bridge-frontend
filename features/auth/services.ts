@@ -2,41 +2,39 @@
 
 import { headers } from "next/headers";
 
-const API_URL = process.env.API_URL;
+const API_URL = process.env.API_URL!;
 
-// ✅ Get current user profile
-export const getProfile = async () => {
-  try {
-    const incomingHeaders = headers(); // forwards all headers including cookies
+/* =========================
+   GET CURRENT USER PROFILE
+========================= */
+export async function getProfile() {
+  const incomingHeaders = headers(); // ✅ sync, NO await
 
-    const res = await fetch(`${API_URL}/api/auth/me`, {
-      headers: incomingHeaders,
-      cache: "no-store",
-    });
+  const res = await fetch(`${API_URL}/api/auth/me`, {
+    headers: incomingHeaders, // 🔥 forwards Cookie header
+    cache: "no-store",
+  });
 
-    if (!res.ok) return null;
-    return await res.json();
-  } catch (error) {
-    console.error("Failed to get profile:", error);
-    return null;
+  if (!res.ok) return null;
+
+  return res.json();
+}
+
+/* =========================
+   LOGOUT USER
+========================= */
+export async function logoutUser() {
+  const incomingHeaders = headers(); // ✅ same pattern
+
+  const res = await fetch(`${API_URL}/api/auth/logout`, {
+    method: "POST",
+    headers: incomingHeaders, // 🔥 cookie forwarded
+    cache: "no-store",
+  });
+
+  if (!res.ok) {
+    throw new Error("Logout failed");
   }
-};
 
-// ✅ Logout user
-export const logoutUser = async () => {
-  try {
-    const incomingHeaders = headers();
-
-    const res = await fetch(`${API_URL}/api/auth/logout`, {
-      method: "POST",
-      headers: incomingHeaders,
-      cache: "no-store",
-    });
-
-    if (!res.ok) return { error: true };
-    return await res.json();
-  } catch (error) {
-    console.error("Logout failed:", error);
-    return { error: true };
-  }
-};
+  return res.json();
+}
