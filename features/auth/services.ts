@@ -1,6 +1,6 @@
 "use server";
 
-import { headers } from "next/headers";
+import { cookies } from "next/headers";
 
 const API_URL = process.env.API_URL!;
 
@@ -8,10 +8,13 @@ const API_URL = process.env.API_URL!;
    GET CURRENT USER PROFILE
 ========================= */
 export async function getProfile() {
-  const incomingHeaders = headers(); // ✅ sync, NO await
+  const cookieStore = cookies(); // ❌ NO await
+  const cookieHeader = cookieStore.toString(); // ✅ string
 
   const res = await fetch(`${API_URL}/api/auth/me`, {
-    headers: incomingHeaders, // 🔥 forwards Cookie header
+    headers: {
+      Cookie: cookieHeader, // 🔥 manual forward
+    },
     cache: "no-store",
   });
 
@@ -24,11 +27,14 @@ export async function getProfile() {
    LOGOUT USER
 ========================= */
 export async function logoutUser() {
-  const incomingHeaders = headers(); // ✅ same pattern
+  const cookieStore = cookies();
+  const cookieHeader = cookieStore.toString();
 
   const res = await fetch(`${API_URL}/api/auth/logout`, {
     method: "POST",
-    headers: incomingHeaders, // 🔥 cookie forwarded
+    headers: {
+      Cookie: cookieHeader, // 🔥 required
+    },
     cache: "no-store",
   });
 
