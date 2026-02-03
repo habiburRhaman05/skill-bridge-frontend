@@ -10,27 +10,27 @@ const StudentDashboardLayout = async({children}:{
    const userData = await getProfile();
 
 
-  //  if(!userData){
-  //   redirect("/sign-in")
-  //  }
-  //  if(userData?.user.data.role !== "STUDENT"){
-  //   redirect("/")
-  //  }
+   if(!userData){
+    redirect("/sign-in")
+   }
+   if(userData?.user.data.role !== "STUDENT"){
+    redirect("/")
+   }
 
   return (
     <main className='w-full '>
       {userData?.cookies}
       {JSON.stringify(userData?.user.data)}
       dashbaord
-{/* <Header/> */}
-    {/* <div className=' w-full flex'>
+<Header/>
+    <div className=' w-full flex'>
   <DashboardSidebar
       userRole={userData.user.data.role}
       />
         <div className=' w-full'>
           {children}
         </div>
-    </div> */}
+    </div>
     </main>
   )
 }
