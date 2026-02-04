@@ -21,6 +21,7 @@ import { httpRequest } from "@/config/axios/axios";
 import { cn } from "@/lib/utils";
 import CategoryCard from "@/features/admin/components/CategoryCard";
 import { EmptyState } from "@/features/student-dashboard/components/EmptyState";
+import { createCategoryByAdmin, deleteCategoryByAdmin, updateCategoryByAdmin } from "@/features/admin/services";
 
 const CategoryManager = () => {
   const queryClient = useQueryClient();
@@ -85,18 +86,20 @@ const CategoryManager = () => {
     onError: (err: any) => toast.error(err.response?.data?.message || "Operation failed"),
   });
 
-  const createMutation = useMutation({
-    mutationFn: (data: any) => httpRequest.post(`/api/admin/categories`, data),
+ const createMutation = useMutation({
+    mutationFn: (data: any) => createCategoryByAdmin(data),
     ...mutationOptions("Category created"),
   });
 
   const updateMutation = useMutation({
-    mutationFn: (data: any) => httpRequest.patch(`/api/admin/categories/${editingCategory?.id}`, data),
+    mutationFn: (data: any) =>
+      updateCategoryByAdmin(editingCategory!.id, data),
     ...mutationOptions("Changes saved"),
   });
 
   const deleteMutation = useMutation({
-    mutationFn: () => httpRequest.delete(`/api/admin/categories/${editingCategory?.id}`),
+    mutationFn: () =>
+      deleteCategoryByAdmin(editingCategory!.id),
     ...mutationOptions("Category deleted permanently"),
   });
 

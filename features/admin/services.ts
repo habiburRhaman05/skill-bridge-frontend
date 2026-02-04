@@ -3,16 +3,14 @@
 import { revalidatePath } from "next/cache";
 import { getToken } from "../student-dashboard/services";
 
-/**
- * Admin services updated to use the 'cookie' header for authentication.
- */
+const API_URL = process.env.API_URL;
 
 export const getAllUsersByAdmin = async () => {
   try {
     const cookieString = await getToken(); // Returns cookieStore.toString()
     if (!cookieString) throw new Error("Unauthorized: No cookies found");
 
-    const res = await fetch(`${process.env.API_URL}/api/admin/users`, {
+    const res = await fetch(`${API_URL}/api/admin/users`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -32,7 +30,7 @@ export const getLatestUsers = async () => {
     const cookieString = await getToken(); // Returns cookieStore.toString()
     if (!cookieString) throw new Error("Unauthorized: No cookies found");
 
-    const res = await fetch(`${process.env.API_URL}/api/admin/users`, {
+    const res = await fetch(`${API_URL}/api/admin/users`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -55,7 +53,7 @@ export const updateUserStatus = async (payload: { userId: string; body: { status
     if (!cookieString) throw new Error("Unauthorized: No cookies found");
 
     const res = await fetch(
-      `${process.env.API_URL}/api/admin/users/${payload.userId}/status`,
+      `${API_URL}/api/admin/users/${payload.userId}/status`,
       {
         method: "PATCH",
         headers: {
@@ -84,7 +82,7 @@ export const getAllBookingsByAdmin = async () => {
     const cookieString = await getToken();
     if (!cookieString) throw new Error("Unauthorized: No cookies found");
 
-    const res = await fetch(`${process.env.API_URL}/api/admin/bookings`, {
+    const res = await fetch(`${API_URL}/api/admin/bookings`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -108,7 +106,7 @@ export const getLatestBooking = async () => {
     const cookieString = await getToken();
     if (!cookieString) throw new Error("Unauthorized: No cookies found");
 
-    const res = await fetch(`${process.env.API_URL}/api/admin/bookings`, {
+    const res = await fetch(`${API_URL}/api/admin/bookings`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -133,7 +131,7 @@ export const getDashboardOverviewStars = async () => {
     const cookieString = await getToken();
     if (!cookieString) throw new Error("Unauthorized: No cookies found");
 
-    const res = await fetch(`${process.env.API_URL}/api/admin/get-dashboard-data`, {
+    const res = await fetch(`${API_URL}/api/admin/get-dashboard-data`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -155,3 +153,83 @@ export const getDashboardOverviewStars = async () => {
   }
 };
 
+
+
+
+
+export const createCategoryByAdmin = async (data: any) => {
+  try {
+    const cookieString = await getToken();
+    if (!cookieString) throw new Error("Unauthorized");
+
+    const res = await fetch(`${API_URL}/api/admin/categories`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        cookie: cookieString,
+      },
+      body: JSON.stringify(data),
+      cache: "no-store",
+    });
+
+    if (!res.ok) throw new Error("Failed to create category");
+
+    return await res.json();
+  } catch (error) {
+    console.error("createCategoryByAdmin error:", error);
+    throw error;
+  }
+};
+
+
+export const updateCategoryByAdmin = async (
+  id: string,
+  data: any
+) => {
+  try {
+    const cookieString = await getToken();
+    if (!cookieString) throw new Error("Unauthorized");
+
+    const res = await fetch(`${API_URL}/api/admin/categories/${id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        cookie: cookieString,
+      },
+      body: JSON.stringify(data),
+      cache: "no-store",
+    });
+
+    if (!res.ok) throw new Error("Failed to update category");
+
+    return await res.json();
+  } catch (error) {
+    console.error("updateCategoryByAdmin error:", error);
+    throw error;
+  }
+};
+
+
+
+
+export const deleteCategoryByAdmin = async (id: string) => {
+  try {
+    const cookieString = await getToken();
+    if (!cookieString) throw new Error("Unauthorized");
+
+    const res = await fetch(`${API_URL}/api/admin/categories/${id}`, {
+      method: "DELETE",
+      headers: {
+        cookie: cookieString,
+      },
+      cache: "no-store",
+    });
+
+    if (!res.ok) throw new Error("Failed to delete category");
+
+    return await res.json();
+  } catch (error) {
+    console.error("deleteCategoryByAdmin error:", error);
+    throw error;
+  }
+};
