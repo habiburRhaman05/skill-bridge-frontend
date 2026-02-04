@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Categories from "@/features/landing-page/Categories";
 import FeaturedTutors from "@/features/landing-page/FeaturedTutors";
+import DashboardKPIs from "@/features/landing-page/KpisReport";
 import { motion } from "framer-motion";
 import {
   BookOpen,
@@ -76,7 +77,7 @@ const LandingPage = () => {
       </section>
 
       {/* 3. Stats Section (New Content) */}
-      <section className="py-10 border-y border-border bg-card">
+      {/* <section className="py-10 border-y border-border bg-card">
         <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
           {[
             { label: "Active Tutors", val: "500+" },
@@ -90,7 +91,8 @@ const LandingPage = () => {
             </div>
           ))}
         </div>
-      </section>
+      </section> */}
+      <DashboardKPIs/>
 
       {/* 4. How It Works (New Content) */}
       <section id="how-it-works" className="py-24 px-6 overflow-hidden">

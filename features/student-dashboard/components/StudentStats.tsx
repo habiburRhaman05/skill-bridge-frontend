@@ -5,7 +5,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { getDashboardStats } from "../services";
 
 export default async function StudentStats() {
- const response = await getDashboardStats();
+ const {data:response} = await getDashboardStats();
+
+ 
  const statsData = [
   { id: 1, name: "Total Bookings", value: response?.data?.totalBooking,  icon: CalendarCheck, color: "text-blue-600", bg: "bg-blue-50 dark:bg-blue-900/20" },
  

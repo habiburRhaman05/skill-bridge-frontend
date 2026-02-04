@@ -5,6 +5,7 @@ import StudentProfileFrom from "@/features/student-dashboard/components/ProfileF
 
 export default async function StudentProfilePage() {
 const userData = await getProfile();
+console.log(userData);
 
   return <StudentProfileFrom userData={userData?.user.data}/>
 }

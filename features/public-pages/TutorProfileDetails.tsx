@@ -163,7 +163,7 @@ export default function PublicTutorProfile({ data: initialData, student }: Tutor
                   <MapPin className="text-indigo-500" size={18} /> {tutor.category}
                 </div>
                 <div className="flex items-center gap-2">
-                  <Clock className="text-indigo-500" size={18} /> {tutor.hourlyRate} BDT / Hr
+                  <Clock className="text-indigo-500" size={18} /> {tutor.hourlyRate} USD / Hr
                 </div>
               </div>
             </div>
@@ -255,7 +255,7 @@ export default function PublicTutorProfile({ data: initialData, student }: Tutor
             <div className="relative z-10 space-y-6">
               <div>
                 <p className="text-indigo-100 text-sm font-bold opacity-80 uppercase tracking-widest">Rate Per Hour</p>
-                <h2 className="text-5xl font-black">{tutor.hourlyRate} <span className="text-xl font-bold">BDT</span></h2>
+                <h2 className="text-5xl font-black">{tutor.hourlyRate} <span className="text-xl font-bold">USD</span></h2>
               </div>
 
               <ul className="space-y-4">

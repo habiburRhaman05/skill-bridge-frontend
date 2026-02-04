@@ -24,7 +24,7 @@ const TutorCard = ({ tutor }: { tutor: TutorListItem }) => (
         <div className="text-right">
           <p className="text-[10px] font-black uppercase text-zinc-400 tracking-widest mb-1">Hourly Rate</p>
           <p className="text-xl font-black text-indigo-600 dark:text-indigo-400">
-            {tutor.tutorProfile.hourlyRate} <span className="text-xs font-bold">BDT</span>
+            {tutor.tutorProfile.hourlyRate} <span className="text-xs font-bold">USD</span>
           </p>
         </div>
       </div>

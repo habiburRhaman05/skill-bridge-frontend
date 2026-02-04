@@ -1,45 +1,54 @@
 
-export type  Category ={
+export type Category = {
   id: string;
   name: string;
   subjects: string[];
 }
 
-export type  TutorListItem ={
+export type TutorListItem = {
   id: string;
   name: string;
   email: string;
   profileAvater: string | null;
   role: string;
+    location: string;
+  phoneNumber: number;
   status: string;
   createdAt: string;
   tutorProfile: {
     hourlyRate: number;
     subjects: string[];
     category: string;
+    experience: string;
+
   };
 }
 export type tutorProfileType = {
-    name: string;
-    email: string;
-    profileAvater: string
-    tutorProfile:{
+  name: string;
+  email: string;
+  profileAvater: string
+  location: string;
+  phoneNumber: string;
+  tutorProfile: {
     bio: string;
- category: string;
+    category: string;
     categoryId: string;
     hourlyRate: number;
     subjects: string[];
-    }
+    experience: string;
+
+  }
 }
 
 export type updateTutorProfilePayload = {
-    user:{name:string}
-    
-    bio: string;
- category: string;
-    categoryId: string;
-    hourlyRate: number;
-    subjects: string[];
+  user: { name: string ;  location: string;
+  phoneNumber: string;}
+  bio: string;
+  category: string;
+  experience: string;
+  categoryId: string;
+  hourlyRate: number;
+  subjects: string[];
 }
 export type StudentBooking = {
   id: string;
@@ -57,7 +66,7 @@ export type StudentBooking = {
     hourlyRate: number;
     subjects: string[];
     category: string;
-id:string
+    id: string
     user: {
       id: string;
       name: string;
@@ -73,7 +82,7 @@ id:string
 
 
 export type addAvailabilityPayload = {
-   date: Date;
-    startTime: string | undefined;
-    endTime: string | undefined;
+  date: Date;
+  startTime: string | undefined;
+  endTime: string | undefined;
 }

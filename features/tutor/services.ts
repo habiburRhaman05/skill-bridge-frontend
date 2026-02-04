@@ -34,7 +34,7 @@ export const tutorOnboardingHandler = async (payload: unknown) => {
   }
 };
 
-export async function updateTutorProfile(formData: updateTutorProfilePayload) {
+export async function updateTutorProfile(formData: updateTutorProfilePayload | unknown) {
   try {
     const cookieString = await getCookieHeader();
 
@@ -139,10 +139,10 @@ export async function getTutorReviews(tutorId: string) {
   }
 }
 
-export async function getTutorDashboardData(tutorId: string) {
+export async function getTutorDashboardData() {
   try {
     const cookieString = await getCookieHeader();
-    const response = await fetch(`${process.env.API_URL}/api/tutor/${tutorId}/get-dashboard-data`, {
+    const response = await fetch(`${process.env.API_URL}/api/tutor/get-dashboard-data`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

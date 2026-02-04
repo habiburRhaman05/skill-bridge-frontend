@@ -194,7 +194,7 @@ const FilterModal = ({ currentFilters, availableSubjects, onApply }: any) => {
         <div className="space-y-8 py-6">
           <div className="space-y-4">
             <div className="flex justify-between font-bold text-sm">
-              <label>Hourly Rate (BDT)</label>
+              <label>Hourly Rate (USD)</label>
               <span className="text-indigo-600">{price[0]} - {price[1]}</span>
             </div>
             <Slider 

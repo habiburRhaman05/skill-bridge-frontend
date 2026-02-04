@@ -100,7 +100,7 @@ const FeaturedTutors = () => {
                     <div>
                       <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest leading-none mb-1">Rate</p>
                       <p className="font-black text-2xl tracking-tight">
-                        ৳{t.tutorProfile?.hourlyRate}
+                        $ {t.tutorProfile?.hourlyRate}
                         <span className="text-muted-foreground text-xs font-medium">/hr</span>
                       </p>
                     </div>
