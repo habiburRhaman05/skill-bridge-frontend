@@ -55,6 +55,7 @@ function BrowseTutorsContent() {
     `/api/tutors?${queryString}`
   );
   const tutors = tutorResponse?.data || [];
+console.log(tutors);
 
   const updateFilters = (updates: Record<string, string | null>) => {
     const params = new URLSearchParams(searchParams.toString());

@@ -8,6 +8,7 @@ export type Category = {
 export type TutorListItem = {
   id: string;
   name: string;
+  avgRating:number
   email: string;
   profileAvater: string | null;
   role: string;
@@ -20,6 +21,11 @@ export type TutorListItem = {
     subjects: string[];
     category: string;
     experience: string;
+    bookings:{
+      review:{
+        rating:number
+      }
+    }[]
 
   };
 }
