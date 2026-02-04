@@ -47,21 +47,21 @@ const SessionManager = async () => {
 
       {/* Main Table Container */}
       <div className="bg-white dark:bg-zinc-950 rounded-[40px] border border-zinc-100 dark:border-zinc-800 shadow-2xl shadow-zinc-200/50 dark:shadow-none overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-separate border-spacing-0">
+          <div className="overflow-x-auto">
+          <table className="w-full border-separate border-spacing-0">
             <thead>
-              <tr className="bg-zinc-50/50 dark:bg-zinc-900/50">
-                <th className="p-6 text-[10px] font-black uppercase text-zinc-400 tracking-widest border-b border-zinc-100 dark:border-zinc-800">Tutor / Subject</th>
-                <th className="p-6 text-[10px] font-black uppercase text-zinc-400 tracking-widest border-b border-zinc-100 dark:border-zinc-800">Student Journey</th>
-                <th className="p-6 text-[10px] font-black uppercase text-zinc-400 tracking-widest border-b border-zinc-100 dark:border-zinc-800">Timing</th>
-                <th className="p-6 text-[10px] font-black uppercase text-zinc-400 tracking-widest border-b border-zinc-100 dark:border-zinc-800 text-center">Status</th>
-                <th className="p-6 text-[10px] font-black uppercase text-zinc-400 tracking-widest border-b border-zinc-100 dark:border-zinc-800">Revenue</th>
-             
+              <tr className="bg-zinc-50/50 dark:bg-zinc-800/20">
+                <th className="px-8 py-5 text-[11px] font-black uppercase text-zinc-400 tracking-widest text-left">Tutor Details</th>
+                <th className="px-8 py-5 text-[11px] font-black uppercase text-zinc-400 tracking-widest text-left">Learner</th>
+                <th className="px-8 py-5 text-[11px] font-black uppercase text-zinc-400 tracking-widest text-left">Schedule</th>
+                <th className="px-8 py-5 text-[11px] font-black uppercase text-zinc-400 tracking-widest text-center">Current Status</th>
+                <th className="px-8 py-5 text-[11px] font-black uppercase text-zinc-400 tracking-widest text-right">Revenue</th>
+                <th className="px-8 py-5 text-[11px] font-black uppercase text-zinc-400 tracking-widest text-right"></th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-50 dark:divide-zinc-900">
+            <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
               {data?.map((session: any) => (
-              <BookingRow session={session} key={session.id}/>
+                <BookingRow session={session} key={session.id}/>
               ))}
             </tbody>
           </table>

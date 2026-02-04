@@ -1,141 +1,143 @@
 "use client";
 
 import React, { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { TableCell } from "@/components/ui/table";
 import { 
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue 
 } from "@/components/ui/select";
 import { 
-  UserCircle, Eye, GraduationCap, User, Loader2, CheckCircle2
+  UserCircle, GraduationCap, User, Loader2, ShieldCheck, ShieldAlert, Mail
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { updateUserStatus } from "../services";
-import axios from "axios";
-import { useRefetchQueries } from "@/lib/react-query";
-import { useApiMutation } from "@/hooks/useApiMutation";
 
 const UserCard = ({ user }: { user: {
-  id:string;
-  name:string;
-  role:string;
-  createdAt:string;
-  status:string;
-  email:string;
+  id: string;
+  name: string;
+  role: string;
+  createdAt: string;
+  status: string;
+  email: string;
 } }) => {
-
-
-  const {refetchQueries} = useRefetchQueries()
-
-const [status,setStatus] = useState(user.status)
-  const updateStatusMutation =  useApiMutation({
-    method:"PATCH",
-    endpoint:`/api/admin/users/${user.id}/status`,
-    
-  })
+  const [status, setStatus] = useState(user.status);
   
-  
-  // useMutation({
-  //   mutationFn:(payload:{
-  //     userId:string;
-  //     body:{
-  //       status:string
-  //     }
-  //   })=> axios.patch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/users/${payload.userId}/status`,payload.body,{
-  //     withCredentials:true
-  //   }),
-  //   onSuccess:(res)=>{
-  //     refetchQueries("fetch-users")
+  const updateStatusMutation = useMutation({
+    mutationFn: updateUserStatus,
+    onSuccess: (res) => {
+      setStatus(res.data.status);
+      toast.success("User status updated");
+    },
+    onError: () => {
+      toast.error("Failed to update status");
+    }
+  });
 
-  //      setStatus(res.data.data.status)
-  //     toast.success(res.data.message)
-  //   }
-  // })
-  
-
-  const handleStatusChange = async(val: string) => {
-     await updateStatusMutation.mutateAsync({
-     userId:user.id,
-     body:{
-      status:val
-     }
-     })
+  const handleStatusChange = async (val: string) => {
+    await updateStatusMutation.mutateAsync({
+      userId: user.id,
+      body: { status: val }
+    });
   };
+
+  const isBanned = status === "BANNED";
 
   return (
     <motion.tr 
       layout
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, scale: 0.98 }}
-      className="group border-zinc-50 dark:border-zinc-900 hover:bg-zinc-50/30 dark:hover:bg-zinc-900/40 transition-colors"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className={cn(
+        "group transition-all duration-300",
+        "border-b border-zinc-100/50 dark:border-zinc-800/50",
+        "hover:bg-zinc-50/50 dark:hover:bg-white/[0.02]",
+        isBanned && "opacity-60 grayscale-[0.5]"
+      )}
     >
-      <TableCell className="px-8 py-6">
+      {/* USER IDENTITY */}
+      <TableCell className="py-5 pl-6">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center text-zinc-400 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300 shadow-sm">
-            <UserCircle size={24} />
+          <div className="relative">
+            <div className={cn(
+              "w-11 h-11 rounded-full flex items-center justify-center transition-all duration-500",
+              "bg-gradient-to-br from-zinc-100 to-zinc-200 dark:from-zinc-800 dark:to-zinc-900",
+              "ring-1 ring-zinc-200 dark:ring-zinc-700 group-hover:ring-primary/50"
+            )}>
+              <UserCircle className="w-6 h-6 text-zinc-500" />
+            </div>
+            {status === "ACTIVE" && (
+              <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 rounded-full border-2 border-white dark:border-zinc-950" />
+            )}
           </div>
-          <div>
-            <p className="font-black text-zinc-900 dark:text-zinc-100 text-base leading-tight">{user.name}</p>
-            <p className="text-xs text-zinc-400 font-bold tracking-tight mt-0.5">{user.email}</p>
+          <div className="flex flex-col gap-0.5">
+            <span className="font-semibold text-sm tracking-tight text-zinc-900 dark:text-zinc-100">
+              {user.name}
+            </span>
+            <div className="flex items-center gap-1.5 text-zinc-500">
+              <Mail className="w-3 h-3" />
+              <span className="text-xs font-medium uppercase tracking-wider opacity-70">{user.email}</span>
+            </div>
           </div>
         </div>
       </TableCell>
 
+      {/* ROLE BADGE */}
       <TableCell>
-        <div className="flex items-center gap-2.5">
-          <div className={cn(
-            "p-2 rounded-xl",
-            user.role === "Tutor" ? "bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600" : "bg-amber-50 dark:bg-amber-500/10 text-amber-600"
-          )}>
-            {user.role === "Tutor" ? <GraduationCap size={16} /> : <User size={16} />}
-          </div>
-          <span className="text-xs font-black uppercase tracking-wider text-zinc-700 dark:text-zinc-300">{user.role}</span>
+        <div className={cn(
+          "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold uppercase tracking-wider ring-1 ring-inset",
+          user.role === "Tutor" 
+            ? "bg-indigo-50/50 text-indigo-600 ring-indigo-500/20 dark:bg-indigo-500/10 dark:text-indigo-400" 
+            : "bg-zinc-50/50 text-zinc-600 ring-zinc-500/20 dark:bg-zinc-500/10 dark:text-zinc-400"
+        )}>
+          {user.role === "Tutor" ? <GraduationCap size={12} /> : <User size={12} />}
+          {user.role}
         </div>
       </TableCell>
 
-      <TableCell>
-        <div className="relative flex items-center">
+      {/* STATUS SELECTOR */}
+      <TableCell className="pr-6">
+        <div className="flex items-center justify-end">
           <Select 
             defaultValue={status} 
             disabled={updateStatusMutation.isPending}
             onValueChange={handleStatusChange}
           >
             <SelectTrigger className={cn(
-              "w-40 h-10 rounded-xl border-none font-black text-[10px] uppercase tracking-widest transition-all shadow-sm",
-              user.status === "ACTIVE" ? "bg-emerald-500/10 text-emerald-600" : "bg-rose-500/10 text-rose-600",
-              updateStatusMutation.isSuccess && "bg-emerald-500 text-white" // Flash green on success
+              "h-9 w-36 rounded-lg border-zinc-200 dark:border-zinc-800 transition-all focus:ring-2",
+              "text-[11px] font-bold tracking-widest uppercase bg-transparent",
+              status === "ACTIVE" 
+                ? "text-emerald-600 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-400/10" 
+                : "text-rose-600 hover:bg-rose-50 dark:text-rose-400 dark:hover:bg-rose-400/10"
             )}>
-              {updateStatusMutation.isPending ?
+              {updateStatusMutation.isPending ? (
                 <div className="flex items-center gap-2">
                   <Loader2 className="h-3 w-3 animate-spin" />
-                  <span>Syncing...</span>
-                </div> : <SelectValue/>
-              }
+                  <span>UPDATING</span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  {status === "ACTIVE" ? <ShieldCheck className="w-3.5 h-3.5" /> : <ShieldAlert className="w-3.5 h-3.5" />}
+                  <SelectValue />
+                </div>
+              )}
             </SelectTrigger>
             
-            <SelectContent className="rounded-2xl border-zinc-100 dark:border-zinc-800 p-1.5 shadow-2xl">
-              <SelectItem value="ACTIVE" className="rounded-xl focus:bg-emerald-50 dark:focus:bg-emerald-500/10 text-emerald-600 font-black text-[10px] tracking-widest">
-                AUTHORIZED
+            <SelectContent align="end" className="min-w-[160px] rounded-xl border-zinc-200 dark:border-zinc-800 shadow-xl backdrop-blur-md">
+              <SelectItem value="ACTIVE" className="cursor-pointer focus:bg-emerald-50 dark:focus:bg-emerald-500/10 focus:text-emerald-600 text-[11px] font-bold tracking-widest py-2.5">
+                <div className="flex items-center gap-2 uppercase">
+                  <ShieldCheck className="w-3.5 h-3.5" /> AUTHORIZED
+                </div>
               </SelectItem>
-              <SelectItem value="BANNED" className="rounded-xl focus:bg-rose-50 dark:focus:bg-rose-500/10 text-rose-600 font-black text-[10px] tracking-widest">
-                RESTRICTED
+              <SelectItem value="BANNED" className="cursor-pointer focus:bg-rose-50 dark:focus:bg-rose-500/10 focus:text-rose-600 text-[11px] font-bold tracking-widest py-2.5">
+                <div className="flex items-center gap-2 uppercase">
+                  <ShieldAlert className="w-3.5 h-3.5" /> RESTRICTED
+                </div>
               </SelectItem>
             </SelectContent>
           </Select>
         </div>
-      </TableCell>
-
-      <TableCell className="px-8 text-right">
-        <Button 
-          variant="secondary" 
-          className="rounded-xl font-black text-[10px] uppercase tracking-[0.1em] h-10 px-5 gap-2 bg-zinc-100 dark:bg-zinc-900 hover:bg-indigo-600 hover:text-white transition-all duration-300"
-        >
-          <Eye size={14} strokeWidth={3} /> View {user.role}
-        </Button>
       </TableCell>
     </motion.tr>
   );

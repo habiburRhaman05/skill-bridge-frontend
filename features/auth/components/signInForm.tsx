@@ -1,50 +1,65 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react"; // Added useState
 import { useForm } from "@tanstack/react-form";
-import { zodValidator } from "@tanstack/zod-form-adapter";
 import * as z from "zod";
-import { Loader2 } from "lucide-react";
+import { Loader2, Sparkles } from "lucide-react"; // Added Sparkles for flair
 import { useRouter } from "next/navigation";
 import { useAuthHandlers } from "../auth-handler";
+import { useRefetchQueries } from "@/lib/react-query";
+import { SkillBridgeLoader } from "@/components/shared/SkillBridgeLoader";
 
-// --- Schema Definition ---
 const signInSchema = z.object({
   email: z.string().email("Invalid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
-
 export default function SignInForm() {
-const router = useRouter()
+  const router = useRouter();
   const { signIn } = useAuthHandlers();
+  const { refetchQueries } = useRefetchQueries();
+  
+  // 1. New State to track the transition period
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
-  // --- TanStack Form Logic ---
   const form = useForm({
-    defaultValues: {
-      email: "",
-      password: "",
-    },
-        validators: {
-      onChange: signInSchema,
-    },
+    defaultValues: { email: "", password: "" },
+    validators: { onChange: signInSchema },
     onSubmit: async ({ value }) => {
-     const {user} = await signIn(value);
+      try {
+        const { user } = await signIn(value);
+        
+        if (user) {
+          // 2. Trigger the "Global Loading" state immediately
+          setIsRedirecting(true);
+          
+          await refetchQueries("user-profile");
 
-       if(user && user.role === "TUTOR"){
-      router.push("/tutor/dashboard")
-     }else if(user && user.role === "STUDENT"){
-      router.push("/dashboard")
-     }else{
-      router.push("/admin")
-     }
-     
-     
+          // Determine route
+          const url = user.role === "TUTOR" 
+            ? "/tutor/dashboard" 
+            : user.role === "STUDENT" 
+            ? "/dashboard" 
+            : "/admin";
+
+          // Use window.location for a fresh state, or router.push for SPA speed
+          // window.location.href = route;
+          router.push(url)
+        }
+      } catch (error) {
+        setIsRedirecting(false); // Reset if login fails
+        console.error("Login failed", error);
+      }
     },
   });
 
   return (
-    <div className="w-full">
+    <div className="w-full relative">
+      {/* --- 3. FULL SCREEN LOADING OVERLAY --- */}
+      {isRedirecting && (
+        <SkillBridgeLoader/>
+      )}
+
       <form
         className="mt-6 space-y-5"
         onSubmit={(e) => {
@@ -103,17 +118,9 @@ const router = useRouter()
                   field.state.meta.errors.length ? "border-red-500" : "border-zinc-300 dark:border-zinc-700"
                 } rounded-xl text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-indigo-600 transition-all outline-none`}
               />
-              {field.state.meta.errors.length > 0 && (
-                <p className="text-[11px] text-red-500 font-bold uppercase tracking-tight">
-                  {field.state.meta.errors.map((err: any) => err.message || err).join(", ")}
-                </p>
-              )}
             </div>
           )}
         />
-
-       
-       
 
         {/* Submit Button */}
         <form.Subscribe
@@ -121,10 +128,10 @@ const router = useRouter()
           children={([canSubmit, isSubmitting]) => (
             <button
               type="submit"
-              disabled={!canSubmit || (isSubmitting as boolean)}
-              className="w-full flex items-center justify-center gap-2 py-3.5 px-4 border border-transparent rounded-xl shadow-lg text-sm font-black uppercase tracking-widest text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={!canSubmit || (isSubmitting as boolean) || isRedirecting}
+              className="w-full flex items-center justify-center gap-2 py-3.5 px-4 border border-transparent rounded-xl shadow-lg text-sm font-black uppercase tracking-widest text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none transition-all active:scale-[0.98] disabled:opacity-50"
             >
-              {isSubmitting ? (
+              {(isSubmitting as boolean) || isRedirecting ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
               ) : (
                 "Sign In"

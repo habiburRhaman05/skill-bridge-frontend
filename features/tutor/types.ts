@@ -1,3 +1,24 @@
+
+export type  Category ={
+  id: string;
+  name: string;
+  subjects: string[];
+}
+
+export type  TutorListItem ={
+  id: string;
+  name: string;
+  email: string;
+  profileAvater: string | null;
+  role: string;
+  status: string;
+  createdAt: string;
+  tutorProfile: {
+    hourlyRate: number;
+    subjects: string[];
+    category: string;
+  };
+}
 export type tutorProfileType = {
     name: string;
     email: string;

@@ -1,11 +1,11 @@
 "use client";
 
-import React from "react";
-import { Star, MapPin, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { motion, AnimatePresence } from "framer-motion";
 import { useApiQuery } from "@/hooks/useApiQuery";
-import { cn } from "@/lib/utils";
+import { AnimatePresence, motion } from "framer-motion";
+import { CheckCircle2, Star } from "lucide-react";
+import Link from "next/link";
+import FeaturedTutorSkelection from "../public-pages/FeaturedTutorSkelection";
 
 interface TutorListItem {
   id: string;
@@ -22,31 +22,7 @@ interface TutorListItem {
   };
 }
 
-// --- Internal Skeleton for Tutors ---
-const TutorSkeleton = () => (
-  <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-    {[1, 2, 3].map((i) => (
-      <div key={i} className="bg-card border border-zinc-100 dark:border-zinc-900 p-4 rounded-[40px] animate-pulse">
-        <div className="aspect-[4/3] rounded-[32px] bg-muted mb-6" />
-        <div className="px-2 space-y-4">
-          <div className="flex justify-between">
-            <div className="h-6 w-32 bg-muted rounded-md" />
-            <div className="h-6 w-12 bg-muted rounded-md" />
-          </div>
-          <div className="h-4 w-24 bg-muted/60 rounded-md" />
-          <div className="flex gap-2">
-            <div className="h-6 w-16 bg-muted rounded-lg" />
-            <div className="h-6 w-16 bg-muted rounded-lg" />
-          </div>
-          <div className="flex justify-between items-center pt-2">
-            <div className="h-8 w-20 bg-muted rounded-md" />
-            <div className="h-12 w-28 bg-muted rounded-xl" />
-          </div>
-        </div>
-      </div>
-    ))}
-  </div>
-);
+
 
 const FeaturedTutors = () => {
   const { data: tutorResponse, isLoading } = useApiQuery<{ data: TutorListItem[] }>(
@@ -69,7 +45,7 @@ const FeaturedTutors = () => {
       </div>
 
       {isLoading ? (
-        <TutorSkeleton />
+        <FeaturedTutorSkelection />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <AnimatePresence>
@@ -128,8 +104,10 @@ const FeaturedTutors = () => {
                         <span className="text-muted-foreground text-xs font-medium">/hr</span>
                       </p>
                     </div>
-                    <Button className="rounded-2xl h-12 px-6 bg-zinc-900 dark:bg-zinc-100 dark:text-zinc-900 text-white font-black hover:bg-indigo-600 hover:text-white transition-all duration-300">
+                    <Button  asChild className="rounded-2xl h-12 px-6 bg-zinc-900 dark:bg-zinc-100 dark:text-zinc-900 text-white font-black hover:bg-indigo-600 hover:text-white transition-all duration-300">
+                 <Link href={`/tutors/${t.id}`}>
                       Book Now
+                 </Link>
                     </Button>
                   </div>
                 </div>

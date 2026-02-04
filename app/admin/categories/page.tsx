@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
-  Plus, Trash2, Layers, X, Save, 
-  AlertCircle, Inbox, Loader2, Pencil 
+  Plus, Trash2, X, Save, 
+  AlertCircle, Loader2, Search, Info 
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -16,314 +16,246 @@ import {
 } from "@/components/ui/dialog";
 import { useApiQuery } from "@/hooks/useApiQuery";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
 import { toast } from "sonner";
-
-// --- Skeleton Component ---
-const CategorySkeleton = () => (
-  <div className="grid gap-4">
-    {[1, 2, 3].map((i) => (
-      <div key={i} className="bg-white dark:bg-zinc-950 border border-zinc-100 dark:border-zinc-900 rounded-[32px] p-6 animate-pulse">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-zinc-100 dark:bg-zinc-900 rounded-2xl h-12 w-12" />
-            <div className="space-y-2">
-              <div className="h-5 w-48 bg-zinc-100 dark:bg-zinc-900 rounded-md" />
-              <div className="h-3 w-32 bg-zinc-50 dark:bg-zinc-800 rounded-md" />
-            </div>
-          </div>
-          <div className="h-10 w-10 bg-zinc-50 dark:bg-zinc-900 rounded-xl" />
-        </div>
-        <div className="mt-6 flex gap-2">
-          {[1, 2, 3, 4].map((j) => (
-            <div key={j} className="h-8 w-20 bg-zinc-50 dark:bg-zinc-800 rounded-xl" />
-          ))}
-        </div>
-      </div>
-    ))}
-  </div>
-);
+import { httpRequest } from "@/config/axios/axios";
+import { cn } from "@/lib/utils";
+import CategoryCard from "@/features/admin/components/CategoryCard";
+import { EmptyState } from "@/features/student-dashboard/components/EmptyState";
 
 const CategoryManager = () => {
   const queryClient = useQueryClient();
-
-  // --- API Queries ---
-  const { data: categories, isLoading } = useApiQuery<{
-    data: { id: string; name: string; subjects: string[]; count?: number }[];
-  }>(["fetch-categories"], "/api/shared/categories", {
-    staleTime: 60000,
-  });
-
-  // --- Mutations ---
-  const createCategoryMutation = useMutation({
-    mutationFn: (payload: { name: string; subjects: string[] }) => 
-      axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/categories`, payload, { withCredentials: true }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["fetch-categories"] });
-      toast.success("Category created successfully");
-      setIsModalOpen(false);
-      resetForm();
-    },
-    onError: () => toast.error("Failed to create category"),
-  });
-
-  const updateCategoryMutation = useMutation({
-    mutationFn: ({ id, payload }: { id: string; payload: { name: string; subjects: string[] } }) => 
-      axios.patch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/categories/${id}`, payload, { withCredentials: true }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["fetch-categories"] });
-      toast.success("Category updated successfully");
-      setIsModalOpen(false);
-      resetForm();
-    },
-    onError: (err) => {
-      console.log(err);
-      
-      toast.error("Failed to update category")
-    },
-  });
-
-  const deleteCategoryMutation = useMutation({
-    mutationFn: (id: string) => 
-      axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/categories/${id}`, { withCredentials: true }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["fetch-categories"] });
-      toast.success("Category deleted");
-      setIsDeleteOpen(false);
-      setEditingCategory(null);
-    },
-    onError: () => toast.error("Failed to delete category"),
-  });
-
-  // --- Local State ---
+  
+  // Modal Visibility States
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
-  const [editingCategory, setEditingCategory] = useState<any>(null);
   
+  // Data States
+  const [editingCategory, setEditingCategory] = useState<any>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  
+  // Form States
   const [catName, setCatName] = useState("");
-  const [currentSubject, setCurrentSubject] = useState("");
-  const [subjectsList, setSubjectsList] = useState<string[]>([]);
+  const [currentSub, setCurrentSub] = useState("");
+  const [subjects, setSubjects] = useState<string[]>([]);
+  const [errors, setErrors] = useState<{name?: string, subjects?: string}>({});
 
-  // --- Handlers ---
+  const { data: categories, isLoading } = useApiQuery<{
+    data: { id: string; name: string; subjects: string[] }[];
+  }>(["fetch-categories"], "/api/shared/categories");
+
+  const filteredList = useMemo(() => 
+    categories?.data?.filter(c => c.name.toLowerCase().includes(searchQuery.toLowerCase())) || []
+  , [categories, searchQuery]);
+
+  const isDirty = useMemo(() => {
+    if (!editingCategory) return catName.trim() !== "" || subjects.length > 0;
+    const nameChanged = catName !== editingCategory.name;
+    const subjectsChanged = JSON.stringify([...subjects].sort()) !== JSON.stringify([...editingCategory.subjects].sort());
+    return nameChanged || subjectsChanged;
+  }, [catName, subjects, editingCategory]);
+
   const resetForm = () => {
-    setCatName("");
-    setSubjectsList([]);
-    setCurrentSubject("");
-    setEditingCategory(null);
+    setCatName(""); setSubjects([]); setCurrentSub(""); setEditingCategory(null); setErrors({});
   };
 
-  const openModal = (category: any = null) => {
-    if (category) {
-      setEditingCategory(category);
-      setCatName(category.name);
-      // Map existing subjects into state so they can be removed/added
-      setSubjectsList([...category.subjects]);
-    } else {
-      resetForm();
-    }
-    setIsModalOpen(true);
-  };
-
-  const addSubject = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && currentSubject.trim()) {
+  const handleAddSubject = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && currentSub.trim()) {
       e.preventDefault();
-      if (!subjectsList.includes(currentSubject.trim())) {
-        setSubjectsList(prev => [...prev, currentSubject.trim()]);
-      }
-      setCurrentSubject("");
+      const val = currentSub.trim();
+      if (subjects.includes(val)) return setErrors({ ...errors, subjects: "Already in list" });
+      setSubjects([...subjects, val]);
+      setCurrentSub("");
+      setErrors({ ...errors, subjects: undefined });
     }
   };
 
-  const removeSubject = (sub: string) => {
-    // This handles removing both newly added and pre-existing subjects
-    setSubjectsList(prev => prev.filter(s => s !== sub));
+  const removeSubject = (tagName: string) => {
+    setSubjects(prev => prev.filter(s => s !== tagName));
   };
 
-  const handleSave = async () => {
-    if (!catName.trim()) return toast.error("Category name is required");
-    if (subjectsList.length === 0) return toast.error("Add at least one subject");
+  // Shared Mutation Options
+  const mutationOptions = (successMsg: string) => ({
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["fetch-categories"] });
+      setIsModalOpen(false);
+      setIsDeleteOpen(false);
+      resetForm();
+      toast.success(successMsg);
+    },
+    onError: (err: any) => toast.error(err.response?.data?.message || "Operation failed"),
+  });
 
-    const payload = { name: catName, subjects: subjectsList };
+  const createMutation = useMutation({
+    mutationFn: (data: any) => httpRequest.post(`/api/admin/categories`, data),
+    ...mutationOptions("Category created"),
+  });
 
-    if (editingCategory) {
-      updateCategoryMutation.mutate({ id: editingCategory.id, payload });
-    } else {
-      createCategoryMutation.mutate(payload);
-    }
+  const updateMutation = useMutation({
+    mutationFn: (data: any) => httpRequest.patch(`/api/admin/categories/${editingCategory?.id}`, data),
+    ...mutationOptions("Changes saved"),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: () => httpRequest.delete(`/api/admin/categories/${editingCategory?.id}`),
+    ...mutationOptions("Category deleted permanently"),
+  });
+
+  const validateAndSave = () => {
+    const newErrors: any = {};
+    if (catName.trim().length < 3) newErrors.name = "Minimum 3 characters required";
+    if (subjects.length === 0) newErrors.subjects = "Add at least one subject tag";
+    if (Object.keys(newErrors).length > 0) return setErrors(newErrors);
+
+    const payload = { name: catName, subjects };
+    editingCategory ? updateMutation.mutate(payload) : createMutation.mutate(payload);
   };
-
-  const isMutating = createCategoryMutation.isPending || updateCategoryMutation.isPending;
 
   return (
-    <div className="p-8 space-y-8 max-w-5xl mx-auto">
-      <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
-        <div className="space-y-1">
-          <h1 className="text-5xl font-black tracking-tighter">Categories</h1>
-          <p className="text-zinc-500 font-medium">Define subjects and group tutors.</p>
+    <div className="max-w-6xl mx-auto p-4 md:p-10 space-y-8">
+      {/* Header */}
+      <header className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+        <div>
+          <h1 className="text-3xl md:text-4xl font-black tracking-tight text-zinc-900 dark:text-white">Curriculum</h1>
+          <p className="text-zinc-500 font-medium text-sm md:text-base">Manage academic departments and subject tags.</p>
         </div>
-        <Button 
-          onClick={() => openModal()}
-          className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl h-12 px-6 font-black shadow-lg shadow-indigo-500/20 shrink-0 transition-all active:scale-95"
-        >
-          <Plus className="mr-2 h-5 w-5" /> Add New
-        </Button>
+        <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+          <div className="relative flex-1 sm:w-64">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+            <Input 
+              placeholder="Quick filter..." 
+              className="pl-10 h-11 rounded-xl bg-zinc-100/50 dark:bg-zinc-900 border-none w-full"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+          <Button onClick={() => { resetForm(); setIsModalOpen(true); }} className="h-11 px-5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold">
+            <Plus className="mr-2 w-5 h-5" /> New Category
+          </Button>
+        </div>
       </header>
 
+      {/* Grid Content */}
       {isLoading ? (
-        <CategorySkeleton />
-      ) : (
-        <div className="grid gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[1, 2, 3].map(i => <div key={i} className="h-48 rounded-[24px] bg-zinc-100 dark:bg-zinc-800 animate-pulse" />)}
+        </div>
+      ) : filteredList.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <AnimatePresence mode="popLayout">
-            {categories?.data && categories.data.length > 0 ? (
-              categories.data.map((cat) => (
-                <motion.div 
-                  key={cat.id}
-                  layout
-                  className="group bg-white dark:bg-zinc-950 border border-zinc-100 dark:border-zinc-900 rounded-[32px] p-6 hover:border-indigo-500/30 transition-all shadow-sm"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="p-3 bg-indigo-50 dark:bg-indigo-500/10 rounded-2xl text-indigo-600">
-                        <Layers size={22} />
-                      </div>
-                      <div>
-                        <h3 className="font-black text-xl tracking-tight">{cat.name}</h3>
-                        <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">
-                          {cat.subjects.length} Subjects 
-                        </p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center gap-2">
-                      <Button 
-                        variant="ghost" size="icon" 
-                        onClick={() => openModal(cat)}
-                        className="rounded-xl hover:bg-indigo-50 dark:hover:bg-indigo-500/10 text-indigo-600"
-                      >
-                        <Pencil size={18}/>
-                      </Button>
-                      <Button 
-                        variant="ghost" size="icon" 
-                        onClick={() => { setEditingCategory(cat); setIsDeleteOpen(true); }}
-                        className="rounded-xl hover:bg-red-50 dark:hover:bg-red-500/10 text-red-500"
-                      >
-                        <Trash2 size={18}/>
-                      </Button>
-                    </div>
-                  </div>
-
-                  <div className="mt-6 flex flex-wrap gap-2">
-                    {cat.subjects.map((sub) => (
-                      <Badge key={sub} className="bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 border-none px-4 py-2 rounded-xl font-bold">
-                        {sub}
-                      </Badge>
-                    ))}
-                  </div>
-                </motion.div>
-              ))
-            ) : (
-              <div className="flex flex-col items-center justify-center py-20 bg-zinc-50 dark:bg-zinc-900/30 rounded-[40px] border-2 border-dashed border-zinc-200 dark:border-zinc-800">
-                <Inbox className="w-12 h-12 text-zinc-300 mb-4" />
-                <p className="font-bold text-zinc-500">No categories found.</p>
-              </div>
-            )}
+            {filteredList.map((cat) => (
+              <CategoryCard 
+                key={cat.id} cat={cat} 
+                onDelete={(c:any) => { setEditingCategory(c); setIsDeleteOpen(true); }}
+                onEdit={(c:any) => { setEditingCategory(c); setCatName(c.name); setSubjects(c.subjects); setIsModalOpen(true); }}
+              />
+            ))}
           </AnimatePresence>
         </div>
+      ) : (
+        <EmptyState />
       )}
 
-      {/* Add / Update Modal */}
-      <Dialog open={isModalOpen} onOpenChange={(val) => { if(!val) resetForm(); setIsModalOpen(val); }}>
-        <DialogContent className="sm:max-w-[480px] rounded-[36px] p-8 border-none dark:bg-zinc-950 shadow-2xl">
-          <DialogHeader>
-            <DialogTitle className="text-3xl font-black tracking-tighter">
-              {editingCategory ? "Update Category" : "Create Category"}
-            </DialogTitle>
-            <DialogDescription className="font-medium text-zinc-500">
-              {editingCategory ? "Update subjects by removing tags or adding new ones." : "Set the category name and hit enter to add subjects."}
-            </DialogDescription>
-          </DialogHeader>
+      {/* --- FORM MODAL (CREATE/UPDATE) --- */}
+      <Dialog open={isModalOpen} onOpenChange={(o) => { if(!o) resetForm(); setIsModalOpen(o); }}>
+        <DialogContent className="sm:max-w-[500px] w-[95vw] rounded-[32px] border-none shadow-2xl p-0 overflow-hidden">
+          <div className="p-6 md:p-8 space-y-6">
+            <DialogHeader>
+              <DialogTitle className="text-2xl font-black">{editingCategory ? "Edit" : "New"} Category</DialogTitle>
+            </DialogHeader>
 
-          <div className="space-y-6 py-4">
-            <div className="space-y-2">
-              <Label className="text-[10px] font-black uppercase text-zinc-400 tracking-widest ml-1">Category Name</Label>
-              <Input 
-                value={catName} 
-                onChange={(e) => setCatName(e.target.value)}
-                placeholder="e.g. Science & Engineering" 
-                className="h-14 rounded-2xl bg-zinc-50 dark:bg-zinc-900 border-none font-bold text-lg" 
-              />
-            </div>
+            <div className="space-y-5">
+              <div className="space-y-2">
+                <Label className="text-[11px] font-bold uppercase tracking-widest text-zinc-400 ml-1">Title</Label>
+                <Input 
+                  value={catName}
+                  onChange={(e) => { setCatName(e.target.value); setErrors({...errors, name: undefined}); }}
+                  placeholder="e.g. Computer Science"
+                  className={cn("h-12 rounded-xl bg-zinc-50 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800", errors.name && "border-rose-500 ring-1 ring-rose-500")}
+                />
+                {errors.name && <p className="text-rose-500 text-[10px] font-bold flex items-center gap-1"><AlertCircle size={12}/> {errors.name}</p>}
+              </div>
 
-            <div className="space-y-2">
-              <Label className="text-[10px] font-black uppercase text-zinc-400 tracking-widest ml-1">
-                {editingCategory ? "Edit Subjects" : "Add Subjects"}
-              </Label>
-              <Input 
-                value={currentSubject}
-                onChange={(e) => setCurrentSubject(e.target.value)}
-                onKeyDown={addSubject}
-                placeholder="Type and press Enter..." 
-                className="h-12 rounded-xl bg-zinc-50 dark:bg-zinc-900 border-none font-bold" 
-              />
-              
-              <div className="flex flex-wrap gap-2 mt-4 max-h-40 overflow-y-auto pr-2 custom-scrollbar">
-                <AnimatePresence initial={false}>
-                  {subjectsList.map(sub => (
-                    <motion.div 
-                      key={sub} 
-                      initial={{ scale: 0.8, opacity: 0 }} 
-                      animate={{ scale: 1, opacity: 1 }} 
-                      exit={{ scale: 0.5, opacity: 0 }}
-                      layout
-                    >
-                      <Badge className="bg-indigo-600 hover:bg-indigo-700 text-white border-none py-2 px-3 rounded-xl font-bold flex items-center gap-2 shadow-sm transition-all">
-                        {sub} 
-                        <X 
-                          size={14} 
-                          className="cursor-pointer hover:bg-white/20 rounded-full transition-colors" 
-                          onClick={() => removeSubject(sub)} 
-                        />
-                      </Badge>
-                    </motion.div>
-                  ))}
-                </AnimatePresence>
+              <div className="space-y-2">
+                <Label className="text-[11px] font-bold uppercase tracking-widest text-zinc-400 ml-1">Subjects (Enter to add)</Label>
+                <Input 
+                  value={currentSub}
+                  onChange={(e) => setCurrentSub(e.target.value)}
+                  onKeyDown={handleAddSubject}
+                  placeholder="Type subject..."
+                  className={cn("h-12 rounded-xl bg-zinc-50 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800", errors.subjects && "border-rose-500 ring-1 ring-rose-500")}
+                />
+                {errors.subjects && <p className="text-rose-500 text-[10px] font-bold flex items-center gap-1"><AlertCircle size={12}/> {errors.subjects}</p>}
+                
+                <div className="flex flex-wrap gap-2 pt-2 max-h-[120px] overflow-y-auto pr-2 custom-scrollbar">
+                  <AnimatePresence>
+                    {subjects.map(s => (
+                      <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.5, opacity: 0 }} key={s}>
+                        <Badge className="bg-white dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700 pl-3 pr-1 py-1.5 rounded-lg font-bold flex items-center gap-2">
+                          {s}
+                          <button onClick={() => removeSubject(s)} className="p-0.5 hover:bg-rose-100 hover:text-rose-600 rounded-md transition-colors">
+                            <X size={14} />
+                          </button>
+                        </Badge>
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                </div>
               </div>
             </div>
           </div>
 
-          <DialogFooter>
-            <Button 
-              disabled={isMutating}
-              className="w-full h-14 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-black text-lg gap-2" 
-              onClick={handleSave}
-            >
-              {isMutating ? <Loader2 className="animate-spin" /> : <Save size={20} />}
-              {isMutating ? "Saving Changes..." : editingCategory ? "Update Category" : "Create Now"}
-            </Button>
-          </DialogFooter>
+          <div className="bg-zinc-50 dark:bg-zinc-900/50 p-6 flex flex-col sm:flex-row items-center justify-between border-t border-zinc-100 dark:border-zinc-800 gap-4">
+            <div className="flex items-center gap-2">
+              {isDirty ? (
+                <span className="text-[10px] font-bold uppercase text-amber-500 flex items-center gap-1 bg-amber-500/10 px-2 py-1 rounded-md">
+                  <Info size={12}/> Unsaved changes
+                </span>
+              ) : (
+                <span className="text-[10px] font-bold uppercase text-zinc-400 px-2">Up to date</span>
+              )}
+            </div>
+            <div className="flex gap-2 w-full sm:w-auto">
+              <Button variant="ghost" onClick={() => setIsModalOpen(false)} className="flex-1 sm:flex-none rounded-xl font-bold">Cancel</Button>
+              <Button 
+                onClick={validateAndSave}
+                disabled={!isDirty || createMutation.isPending || updateMutation.isPending}
+                className={cn(
+                  "flex-1 sm:flex-none px-8 rounded-xl font-bold shadow-lg transition-all",
+                  isDirty ? "bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-500/20" : "bg-zinc-200 dark:bg-zinc-800 text-zinc-400 cursor-not-allowed shadow-none"
+                )}
+              >
+                {(createMutation.isPending || updateMutation.isPending) ? <Loader2 className="animate-spin w-4 h-4" /> : <Save className="w-4 h-4 mr-2" />}
+                {editingCategory ? "Update" : "Create"}
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
 
-      {/* Delete Confirmation */}
+      {/* --- DELETE CONFIRMATION MODAL --- */}
       <Dialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
-        <DialogContent className="sm:max-w-[400px] rounded-[32px] p-8 border-none text-center dark:bg-zinc-950">
-          <div className="mx-auto w-16 h-16 bg-red-100 dark:bg-red-500/10 text-red-500 rounded-2xl flex items-center justify-center mb-4">
-            <AlertCircle size={32} />
-          </div>
+        <DialogContent className="sm:max-w-[400px] rounded-[24px]">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-black tracking-tight">Are you sure?</DialogTitle>
-            <DialogDescription className="font-medium">
-              You're removing <span className="text-zinc-900 dark:text-white font-bold">{editingCategory?.name}</span>. This action is permanent.
+            <DialogTitle className="text-xl font-bold flex items-center gap-2 text-rose-600">
+              <AlertCircle size={20} /> Confirm Deletion
+            </DialogTitle>
+            <DialogDescription className="pt-2">
+              Are you sure you want to delete <span className="font-bold text-zinc-900 dark:text-zinc-100">"{editingCategory?.name}"</span>? 
+              This action cannot be undone and will remove all associated subject tags.
             </DialogDescription>
           </DialogHeader>
-          <div className="flex gap-3 mt-8">
-            <Button variant="ghost" className="flex-1 h-12 rounded-xl font-bold" onClick={() => setIsDeleteOpen(false)} disabled={deleteCategoryMutation.isPending}>
-              Cancel
+          <DialogFooter className="mt-4 flex gap-2">
+            <Button variant="ghost" onClick={() => setIsDeleteOpen(false)} className="rounded-xl">Cancel</Button>
+            <Button 
+              variant="destructive" 
+              onClick={() => deleteMutation.mutate()} 
+              disabled={deleteMutation.isPending}
+              className="rounded-xl font-bold px-6 shadow-lg shadow-rose-500/20"
+            >
+              {deleteMutation.isPending ? <Loader2 className="animate-spin w-4 h-4 mr-2" /> : <Trash2 size={16} className="mr-2" />}
+              Delete Permanently
             </Button>
-            <Button className="flex-1 h-12 bg-red-500 hover:bg-red-600 rounded-xl font-black text-white gap-2 transition-all active:scale-95" onClick={() => editingCategory && deleteCategoryMutation.mutate(editingCategory.id)} disabled={deleteCategoryMutation.isPending}>
-              {deleteCategoryMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Confirm Delete"}
-            </Button>
-          </div>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

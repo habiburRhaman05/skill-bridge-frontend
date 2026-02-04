@@ -1,53 +1,36 @@
 "use client"
 
-import React, { useState, useMemo, Suspense } from "react";
-import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
-import { 
-  Search, SlidersHorizontal, Star, FilterX, 
-  GraduationCap, RefreshCcw, AlertCircle,
-  X, Check, ArrowRight, BookOpen
-} from "lucide-react";
-import Link from "next/link";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { 
-  Dialog, DialogContent, DialogHeader, 
-  DialogTitle, DialogTrigger, DialogFooter 
+import {
+  Dialog, DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle, DialogTrigger
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
+import EmptyState from "@/features/tutor/components/EmptyState";
+import TutorCard from "@/features/tutor/components/TutorCard";
+import TutorCardSkeleton from "@/features/tutor/components/TutorCardSkelection";
+import { Category, TutorListItem } from "@/features/tutor/types";
 import { useApiQuery } from "@/hooks/useApiQuery";
+import { AnimatePresence, motion } from "framer-motion";
+import {
+  BookOpen,
+  Search, SlidersHorizontal, Star
+} from "lucide-react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useMemo, useState } from "react";
 
-// --- Types ---
-interface Category {
-  id: string;
-  name: string;
-  subjects: string[];
-}
 
-interface TutorListItem {
-  id: string;
-  name: string;
-  email: string;
-  profileAvater: string | null;
-  role: string;
-  status: string;
-  createdAt: string;
-  tutorProfile: {
-    hourlyRate: number;
-    subjects: string[];
-    category: string;
-  };
-}
 
-// --- Main Logic Wrapped for Suspense ---
+
 function BrowseTutorsContent() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  // --- URL State Sync ---
+
   const currentCategory = searchParams.get("category") || "All";
   const currentSubject = searchParams.get("subject") || "";
   const currentSearch = searchParams.get("q") || "";
@@ -161,7 +144,7 @@ function BrowseTutorsContent() {
       <main className="max-w-7xl mx-auto px-6 mt-10">
         <AnimatePresence mode="wait">
           {isLoading ? (
-            <TutorGridSkeleton key="skeleton" />
+            <TutorCardSkeleton key="skeleton" />
           ) : tutors.length > 0 ? (
             <motion.div 
               initial={{ opacity: 0 }} animate={{ opacity: 1 }}
@@ -181,7 +164,7 @@ function BrowseTutorsContent() {
 // --- Default Export with Suspense Wrapper ---
 export default function BrowseTutorsPage() {
   return (
-    <Suspense fallback={<TutorGridSkeleton />}>
+    <Suspense fallback={<TutorCardSkeleton />}>
       <BrowseTutorsContent />
     </Suspense>
   );
@@ -293,96 +276,7 @@ const CategoryBadge = ({ label, active, onClick }: { label: string, active: bool
   </button>
 );
 
-const TutorCard = ({ tutor }: { tutor: TutorListItem }) => (
-  <motion.div 
-    layout
-    whileHover={{ y: -6 }}
-    className="group bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-[32px] p-6 hover:shadow-2xl hover:shadow-indigo-500/10 transition-all duration-300 flex flex-col justify-between h-full"
-  >
-    <div>
-      <div className="flex justify-between items-start mb-6">
-        <div className="h-16 w-16 rounded-2xl bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center font-black text-indigo-600 text-2xl uppercase shadow-inner overflow-hidden">
-          {tutor.profileAvater ? (
-            <img src={tutor.profileAvater} className="w-full h-full object-cover" alt={tutor.name} />
-          ) : (
-            tutor.name.charAt(0)
-          )}
-        </div>
-        <div className="text-right">
-          <p className="text-[10px] font-black uppercase text-zinc-400 tracking-widest mb-1">Hourly Rate</p>
-          <p className="text-xl font-black text-indigo-600 dark:text-indigo-400">
-            {tutor.tutorProfile.hourlyRate} <span className="text-xs font-bold">BDT</span>
-          </p>
-        </div>
-      </div>
 
-      <div className="space-y-3 mb-6">
-        <div className="flex items-center gap-2">
-          <h3 className="text-xl font-black tracking-tight">{tutor.name}</h3>
-          <Badge className="bg-emerald-500/10 text-emerald-600 border-none px-1.5 py-0 h-5">
-            <Star className="fill-emerald-600 mr-1" size={10}/> <span className="text-[10px]">New</span>
-          </Badge>
-        </div>
-        
-        <p className="text-xs font-bold text-zinc-500 flex items-center gap-1.5 uppercase tracking-wide">
-          <GraduationCap size={15} className="text-indigo-500" /> {tutor.tutorProfile.category}
-        </p>
 
-        <div className="flex flex-wrap gap-1.5 mt-4 min-h-[80px] content-start">
-          {tutor.tutorProfile.subjects.slice(0, 5).map((s, idx) => (
-            <Badge key={idx} variant="secondary" className="rounded-lg bg-zinc-100 dark:bg-zinc-800 text-[10px] font-bold py-1 px-2 border-none">
-              {s}
-            </Badge>
-          ))}
-          {tutor.tutorProfile.subjects.length > 5 && (
-            <Badge variant="outline" className="text-[10px] border-dashed">+{tutor.tutorProfile.subjects.length - 5} More</Badge>
-          )}
-        </div>
-      </div>
-    </div>
 
-    <Link href={`/tutors/${tutor.id}`} className="block mt-4">
-      <Button className="w-full bg-zinc-900 dark:bg-zinc-50 dark:text-zinc-900 rounded-xl font-bold h-12 group transition-all">
-        View Full Profile <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" size={18} />
-      </Button>
-    </Link>
-  </motion.div>
-);
 
-const TutorGridSkeleton = () => (
-  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-    {[1, 2, 3, 4, 5, 6].map(i => (
-      <div key={i} className="h-[380px] bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-[32px] animate-pulse p-6">
-        <div className="flex justify-between mb-8">
-          <div className="h-16 w-16 bg-zinc-100 dark:bg-zinc-800 rounded-2xl" />
-          <div className="space-y-2">
-            <div className="h-3 w-16 bg-zinc-100 dark:bg-zinc-800 rounded ml-auto" />
-            <div className="h-6 w-24 bg-zinc-100 dark:bg-zinc-800 rounded" />
-          </div>
-        </div>
-        <div className="space-y-6">
-          <div className="h-8 w-2/3 bg-zinc-100 dark:bg-zinc-800 rounded-lg" />
-          <div className="h-4 w-1/3 bg-zinc-100 dark:bg-zinc-800 rounded" />
-          <div className="flex gap-2">
-            <div className="h-8 w-20 bg-zinc-100 dark:bg-zinc-800 rounded-lg" />
-            <div className="h-8 w-20 bg-zinc-100 dark:bg-zinc-800 rounded-lg" />
-          </div>
-          <div className="h-12 w-full bg-zinc-100 dark:bg-zinc-800 rounded-xl mt-4" />
-        </div>
-      </div>
-    ))}
-  </div>
-);
-
-const EmptyState = ({ onReset }: { onReset: () => void }) => (
-  <div className="flex flex-col items-center justify-center py-20 text-center">
-    <div className="h-20 w-20 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center mb-6">
-      <FilterX size={40} className="text-zinc-400" />
-    </div>
-    <h3 className="text-2xl font-black mb-2">No Tutors Found</h3>
-    <p className="text-zinc-500 mb-8 max-w-xs">We couldn't find any tutors matching your current filters. Try adjusting them.</p>
-    <Button onClick={onReset} variant="outline" className="rounded-xl font-bold">
-      <RefreshCcw size={18} className="mr-2" /> Reset All Filters
-    </Button>
-  </div>
-);
