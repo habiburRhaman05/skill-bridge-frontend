@@ -58,31 +58,6 @@ export async function updateProfile(formData: updateProfilePayload) {
   }
 }
 
-export const updateAvatar = async (file: File) => {
-  try {
-    const formData = new FormData();
-    formData.append("profileAvatar", file);
-    
-    const token = await getToken();
-
-    const response = await fetch(`${process.env.API_URL}/api/student/profile/avater-change`, {
-      method: "POST",
-      headers: {
-        // IMPORTANT: Do not set Content-Type for FormData; 
-        // the system needs to generate the boundary automatically.
-        cookie: token,
-      },
-      body: formData,
-    });
-
-    const result = await response.json();
-    revalidatePath("/dashboard/profile");
-    return result;
-  } catch (error) {
-    console.error("updateAvatar error:", error);
-    return { error: "Failed to update avatar" };
-  }
-};
 
 export const changePassword = async (data: any) => {
   try {

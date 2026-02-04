@@ -1,27 +1,39 @@
-
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
-  const body = await req.json();
+  try {
+    const body = await req.json();
 
-  const backendRes = await fetch(
-    "https://skill-bridge-backend-production-f720.up.railway.app/api/auth/login",
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-      credentials: "include",
+    // Call backend API
+    const backendRes = await fetch(
+      "https://skill-bridge-backend-production-f720.up.railway.app/api/auth/login",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      }
+    );
+
+    // Parse JSON safely
+    const backendData = await backendRes.json();
+
+    // Prepare NextResponse with same status
+    const res = NextResponse.json(backendData, { status: backendRes.status });
+
+    // Forward Set-Cookie if exists
+    const setCookie = backendRes.headers.get("set-cookie");
+    if (setCookie) {
+      res.headers.set("set-cookie", setCookie);
     }
-  );
+  
+    
 
-  const res = new NextResponse(await backendRes.text(), {
-    status: backendRes.status,
-  });
-
-  const setCookie = backendRes.headers.get("set-cookie");
-  if (setCookie) {
-    res.headers.set("set-cookie", setCookie);
+    return res;
+  } catch (err: any) {
+    console.error("API error:", err);
+    return NextResponse.json(
+      { error: err.message || "Server error" },
+      { status: 500 }
+    );
   }
-
-  return res;
 }

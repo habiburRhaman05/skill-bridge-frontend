@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { useAuthHandlers } from "../auth-handler";
 import { useRefetchQueries } from "@/lib/react-query";
 import { SkillBridgeLoader } from "@/components/shared/SkillBridgeLoader";
+import { toast } from "sonner";
 
 const signInSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -27,10 +28,14 @@ export default function SignInForm() {
     validators: { onChange: signInSchema },
     onSubmit: async ({ value }) => {
       try {
-        const { user } = await signIn(value);
-        
+        const { user,error } = await signIn(value);
+      
+        if(error){
+          toast.error(error)
+        }
         if (user) {
           // 2. Trigger the "Global Loading" state immediately
+          toast.success("You are Logged in successfully")
           setIsRedirecting(true);
           
           await refetchQueries("user-profile");

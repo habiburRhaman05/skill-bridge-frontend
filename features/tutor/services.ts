@@ -56,29 +56,7 @@ export async function updateTutorProfile(formData: updateTutorProfilePayload) {
   }
 }
 
-export const updateTutorAvatar = async (file: File) => {
-  try {
-    const formData = new FormData();
-    formData.append("profileAvatar", file);
-    
-    const cookieString = await getCookieHeader();
 
-    const response = await fetch(`${process.env.API_URL}/api/student/profile/avater-change`, {
-      method: "POST",
-      headers: {
-        cookie: cookieString,
-      },
-      body: formData,
-    });
-
-    const result = await response.json();
-    revalidatePath("/tutor/dashboard/profile");
-    return result;
-  } catch (error) {
-    console.error("updateTutorAvatar error:", error);
-    return { error: "Failed to update avatar" };
-  }
-};
 
 export const getAllSession = async () => {
   try {

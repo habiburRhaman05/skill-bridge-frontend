@@ -1,27 +1,37 @@
 "use client";
 
-import React, { useState, useMemo, useRef } from "react";
-import { 
-  Mail, X, Info, ImagePlus, Loader2, Save, 
-  MapPin, Phone, Heart, User, Sparkles 
-} from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { AnimatePresence, motion } from "framer-motion";
+import {
+  ImagePlus, Loader2,
+  Mail,
+  MapPin, Phone,
+  Save,
+  User,
+  X
+} from "lucide-react";
+import React, { useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import { motion, AnimatePresence } from "framer-motion";
 
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Dialog, DialogContent, DialogHeader, 
-  DialogTitle, DialogFooter, DialogDescription 
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  Dialog, DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
-import { updateProfile, updateAvatar } from "../services";
+
 import { cn } from "@/lib/utils";
+import { updateProfile } from "../services";
+import { updateAvatar } from "@/features/auth/services";
+import { useRefetchQueries } from "@/lib/react-query";
 
 interface UserProps {
   userData: {
@@ -50,8 +60,9 @@ export default function StudentProfileForm({ userData }: UserProps) {
   const [hobbyInput, setHobbyInput] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [tempPreview, setTempPreview] = useState<string | null>(null);
+  const [profileAvatar, setProfileAvater] = useState<string | null>(userData.profileAvater);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+const {refetchQueries} = useRefetchQueries()
   // --- 2. Mutations ---
   const profileMutation = useMutation({
     mutationFn: updateProfile,
@@ -64,13 +75,21 @@ export default function StudentProfileForm({ userData }: UserProps) {
 
   const avatarMutation = useMutation({
     mutationFn: updateAvatar,
-    onSuccess: () => {
+    onSuccess: (res) => {
+  
+      
+      setProfileAvater(res?.data?.profileAvater)
       setIsModalOpen(false);
       setTempPreview(null);
-      toast.success("Avatar updated");
-      queryClient.invalidateQueries({ queryKey: ["user-session"] });
+  
+      toast.success(res.message);
+         refetchQueries("user-profile")
     },
-    onError: () => toast.error("Upload failed"),
+    onError: (err) => {
+      console.log(err);
+      
+      toast.error("Upload failed")
+    },
   });
 
   // --- 3. Logic & Validation ---
@@ -94,6 +113,23 @@ export default function StudentProfileForm({ userData }: UserProps) {
     };
     reader.readAsDataURL(file);
   };
+
+  const handleAvaterUpload = async ()=>{
+  if (!selectedFile) return;
+
+  const filename = `${userData.name}-profileAvatar`;
+
+  const formData = new FormData();
+
+  formData.append("file", selectedFile, filename);
+
+  formData.append("title", "Profile Avatar");
+  formData.append("description", "User profile picture");
+  console.log(formData);
+  
+  await avatarMutation.mutateAsync(formData)
+    
+  }
 
   const handleSaveDetails = () => {
   
@@ -161,7 +197,7 @@ export default function StudentProfileForm({ userData }: UserProps) {
                     onClick={() => fileInputRef.current?.click()}
                   >
                     <Avatar className="h-full w-full rounded-none">
-                      <AvatarImage src={userData.profileAvater} className="object-cover" />
+                      <AvatarImage src={profileAvatar!} className="object-cover" />
                       <AvatarFallback className="text-4xl bg-indigo-600 text-white font-black">
                         {userData.name[0]}
                       </AvatarFallback>
@@ -286,14 +322,14 @@ export default function StudentProfileForm({ userData }: UserProps) {
           </DialogHeader>
           <div className="flex flex-col items-center py-6">
             <div className="w-44 h-44 rounded-[56px] overflow-hidden ring-8 ring-indigo-50 dark:ring-indigo-900/20 shadow-2xl mb-6">
-              <img src={tempPreview || ""} className="w-full h-full object-cover" alt="Preview" />
+            {isModalOpen &&  <img src={tempPreview || ""} className="w-full h-full object-cover" alt="Preview" />}
             </div>
           </div>
           <DialogFooter className="grid grid-cols-2 gap-3">
             <Button variant="ghost" className="rounded-2xl font-bold h-12" onClick={() => setIsModalOpen(false)} disabled={avatarMutation.isPending}>
               Cancel
             </Button>
-            <Button className="rounded-2xl font-black bg-indigo-600 text-white h-12" onClick={() => avatarMutation.mutate(selectedFile!)} disabled={avatarMutation.isPending}>
+            <Button className="rounded-2xl font-black bg-indigo-600 text-white h-12" onClick={handleAvaterUpload} disabled={avatarMutation.isPending}>
               {avatarMutation.isPending ? <Loader2 className="animate-spin" /> : "Confirm"}
             </Button>
           </DialogFooter>

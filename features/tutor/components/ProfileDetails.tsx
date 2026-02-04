@@ -1,29 +1,33 @@
 "use client";
 
+import { AnimatePresence, motion } from "framer-motion";
 import {
-  Camera, Loader2, Mail, Save, X, Plus, Check, ChevronDown, Search
+  Camera, Loader2, Mail, Save, X
 } from "lucide-react";
-import { useState, useRef, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useMemo, useRef, useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  Dialog, DialogContent,
+  DialogFooter,
+  DialogHeader, DialogTitle
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter
-} from "@/components/ui/dialog";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue
 } from "@/components/ui/select";
-import { cn } from "@/lib/utils";
-import { tutorProfileType } from "../types";
-import { toast } from "sonner";
+import { Textarea } from "@/components/ui/textarea";
+import { updateAvatar } from "@/features/auth/services";
 import { useApiQuery } from "@/hooks/useApiQuery";
+import { cn } from "@/lib/utils";
 import { useMutation } from "@tanstack/react-query";
-import { updateTutorAvatar, updateTutorProfile } from "../services";
+import { toast } from "sonner";
+import { updateTutorProfile } from "../services";
+import { tutorProfileType } from "../types";
+import { useRefetchQueries } from "@/lib/react-query";
 
 export default function TutorProfilePage({ tutor }: { tutor: tutorProfileType }) {
   // --- 1. Fetch Categories ---
@@ -40,11 +44,12 @@ export default function TutorProfilePage({ tutor }: { tutor: tutorProfileType })
   const [isUploading, setIsUploading] = useState(false);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [profileAvater, setProfileAvater] = useState<string | null>(tutor.profileAvater);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
+const {refetchQueries} = useRefetchQueries()
   const initialData = useMemo(() => ({
     name: tutor.name || "",
-    bio: tutor.tutorProfile.bio || "",
+    bio: tutor.tutorProfile.bio || "", 
    
     categoryId: tutor.tutorProfile.categoryId || "",
     category: tutor.tutorProfile.category || "",
@@ -85,10 +90,16 @@ export default function TutorProfilePage({ tutor }: { tutor: tutorProfileType })
     onError: (err: any) => toast.error(err.message)
   });
 const avatarMutation = useMutation({
-    mutationFn: updateTutorAvatar,
+    mutationFn: updateAvatar,
     onSuccess: (res) => {
+      console.log("uploading result",res);
+    
+      setProfileAvater(res.data.profileAvater)
+      
       setPreviewImage(null);
       toast.success("Photo uploaded successfully!");
+      refetchQueries("user-profile")
+
     },
     onError: () => toast.error("Photo upload failed")
   });
@@ -110,12 +121,26 @@ const avatarMutation = useMutation({
     
   };
 
-  const confirmUpload = async () => {
-    if (!selectedFile) return;
+const confirmUpload = async () => {
+  if (!selectedFile) return;
 
-   await avatarMutation.mutateAsync(selectedFile)
- 
-  };
+  // console.log("Selected file:", selectedFile);
+
+  const filename = `${profile.name}-profileAvatar`;
+
+  // Create FormData
+  const formData = new FormData();
+
+  formData.append("file", selectedFile, filename);
+
+  // Append extra details (metadata)
+  formData.append("title", "Profile Avatar");
+  formData.append("description", "User profile picture");
+
+  await avatarMutation.mutateAsync(formData)
+  
+};
+
 
   return (
     <div className="min-h-screen bg-zinc-50/50 dark:bg-background p-4 md:p-12 transition-colors duration-300">
@@ -150,7 +175,7 @@ const avatarMutation = useMutation({
               <CardContent className="p-10 flex flex-col items-center text-center">
                 <div className="relative mb-6">
                   <div className="w-40 h-40 rounded-[48px] overflow-hidden ring-8 ring-zinc-50 dark:ring-zinc-800 shadow-inner">
-                    <img src={tutor.profileAvater} alt="Avatar" className="w-full h-full object-cover" />
+                    <img src={profileAvater!} alt="Avatar" className="w-full h-full object-cover" />
                   </div>
                   <button 
                     onClick={() => fileInputRef.current?.click()}

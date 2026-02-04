@@ -1,10 +1,9 @@
 "use server"
+import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
   
 export const getProfile = async ():Promise<{user:{data:any},cookies:string} | null> => {
  const cookieStore = await cookies();
-
-      console.log(cookieStore.toString());
   const res = await fetch(`${process.env.API_URL}/api/auth/me`, {
     headers: {
       cookie: cookieStore.toString(),
@@ -45,3 +44,25 @@ export const logoutUser = async ()=>{
         
     }
 }
+export const updateAvatar = async (formData: FormData) => {
+  try {
+  
+    const cookieString = await getCookies();
+
+    const response = await fetch(`${process.env.API_URL}/api/auth/profile/change-avater`, {
+      method: "PUT",
+      headers: {
+        cookie: cookieString,
+      },
+      body: formData,
+    });
+
+    const result = await response.json();
+    revalidatePath("/tutor/dashboard/profile");
+    revalidatePath("/dashboard/profile");
+    return result;
+  } catch (error) {
+    console.error("updateTutorAvatar error:", error);
+    return { error: "Failed to update avatar" };
+  }
+};
