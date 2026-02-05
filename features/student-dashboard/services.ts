@@ -10,10 +10,10 @@ export async function getToken() {
   return cookieStore.toString();
 }
 
-export async function getDashboardStats() {
+export async function getDashboardStats(id:string) {
   try {
     const token = await getToken();
-    const res = await fetch(`${process.env.API_URL}/api/student/dashboard/stats`, {
+    const res = await fetch(`${process.env.API_URL}/api/student/${id}/dashboard/stats`, {
       headers: { cookie: token },
     });
     const data = await res.json();
@@ -100,6 +100,29 @@ export const createBooking = async (data: any) => {
     return result;
   } catch (error) {
     console.error("createBooking error:", error);
+    throw error;
+  }
+};
+export const cencelBooking = async (data: any) => {
+  try {
+    const token = await getToken();
+    const response = await fetch(`${process.env.API_URL}/api/booking/${data.bookingId}/cancel-booking`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        cookie: token,
+      },
+      body: JSON.stringify(data.body),
+    });
+
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || "Failed to Cancel booking");
+    
+    revalidatePath(`/tutors/${data.tutorId}`);
+    revalidatePath("/dashboard/bookings");
+    return result;
+  } catch (error) {
+    console.error("cancel Booking error:", error);
     throw error;
   }
 };

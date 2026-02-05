@@ -10,6 +10,7 @@ export default async function StudentOverview() {
 
   const propsData ={
     name: userData?.user.data.name,
+    id: userData?.user.data.id,
   }
 
   return <DashboardContent data={

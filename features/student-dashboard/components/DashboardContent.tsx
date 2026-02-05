@@ -11,7 +11,7 @@ import UserWelcome from "./UserWelcome";
 
 
 
-export default function DashboardContent({data}:{data:{name:string}}) {
+export default function DashboardContent({data}:{data:{name:string;id:string}}) {
   
   return (
     <div 
@@ -22,7 +22,7 @@ export default function DashboardContent({data}:{data:{name:string}}) {
 name={data.name}
 />
     <Suspense fallback={<StudentStatsSkelection/>}>
-        <StudentStats/>
+        <StudentStats userId={data.id}/>
 
     </Suspense>
       <div className="grid gap-6 ">

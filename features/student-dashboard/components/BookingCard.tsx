@@ -17,14 +17,19 @@ import { cn } from "@/lib/utils";
 import { useMutation } from '@tanstack/react-query';
 import { httpRequest } from '@/config/axios/axios';
 import axios from 'axios';
+import { cencelBooking } from '../services';
 
 export const BookingCard = ({ booking }: { booking: any }) => {
   const { tutor, dateTime, status, id } = booking;
   const tutorUser = tutor.user;
  
    const updateCategoryMutation = useMutation({
-    mutationFn: ({ status }: {  status:string }) => 
-      axios.patch(`http://localhost:5000/api/booking/${id}/cancel-booking`, {status}, { withCredentials: true }),
+    mutationFn:(data:{
+      body:{
+        status:string
+      }
+      bookingId:string
+    })  => cencelBooking(data),
     onSuccess: () => {
      
        toast.success("Booking cancelled", { id });
@@ -41,9 +46,12 @@ console.log("e",e);
 
 
   const handleCancelBooking = async () => {
-  await updateCategoryMutation.mutateAsync({
-    status:"CANCELLED"
-  })
+    const payload = {
+      body:{
+            status:"CANCELLED"
+      },bookingId:id
+    }
+  await updateCategoryMutation.mutateAsync(payload)
     
   };
 

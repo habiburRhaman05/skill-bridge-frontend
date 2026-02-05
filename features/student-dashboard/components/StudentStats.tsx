@@ -4,8 +4,8 @@ import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getDashboardStats } from "../services";
 
-export default async function StudentStats() {
- const {data:response} = await getDashboardStats();
+export default async function StudentStats({userId}:{userId:string}) {
+ const {data:response} = await getDashboardStats(userId);
 
  
  const statsData = [
@@ -13,6 +13,9 @@ export default async function StudentStats() {
  
   { id: 3, name: "Reviews Given", value: response?.data?.totalReview , icon: Star, color: "text-amber-600", bg: "bg-amber-50 dark:bg-amber-900/20" },
 ];
+
+console.log(response);
+
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 
