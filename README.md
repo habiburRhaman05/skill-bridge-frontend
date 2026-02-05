@@ -101,7 +101,7 @@ src/
 Create a `.env.local` file in the project root:
 
 ```env
-NEXT_PUBLIC_API_BASE_URL=https://skill-bridge-backend-production-f720.up.railway.app
+NEXT_PUBLIC_API_BASE_URL=https://skill-bridge-backend-production-7e35.up.railway.app
 ```
 
 # Run Locally
@@ -126,6 +126,5 @@ pnpm dev
 
  | Role  | Email                                         | Password   |
 | ----- | --------------------------------------------- | ---------- |
-| Admin | [admin@example.com](mailto:admin@example.com) | admin12345 |
-| Tutor | [tutor1@example.com](mailto:tutor@example.com) | tutor1pass |
-| Tutor | [student1@example.com](mailto:tutor@example.com) | student1pass |
+| Admin | [admin@skillbridge.com](mailto:admin@skillbridge.com) | password123 |
+

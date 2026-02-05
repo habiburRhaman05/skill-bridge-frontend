@@ -154,19 +154,6 @@ const isActive = (href: string) => {
             })}
           </SidebarMenu>
         </SidebarGroup>
-
-        {/* Logout */}
-
-        <div className="mt-auto border-t border-border p-4">
-          <Button
-            variant="ghost"
-            className="w-full justify-start gap-3 text-muted-foreground hover:text-destructive"
-            onClick={handleLogout}
-          >
-            <LogOut className="h-5 w-5" />
-            Logout
-          </Button>
-        </div>
       </SidebarContent>
     </Sidebar>
   )

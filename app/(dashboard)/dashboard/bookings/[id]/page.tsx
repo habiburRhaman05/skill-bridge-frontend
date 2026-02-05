@@ -3,10 +3,9 @@ import { getBookingDetails } from "@/features/student-dashboard/services";
 
 
 export default async function BookingDetailPage({ params }: { params: { id: string } }) {
-  // Await params in Next.js 15+
+
   const { id } = await params;
   
-  // Fetch data on the server
   const booking = await getBookingDetails(id);
 console.log(booking);
 
@@ -18,6 +17,5 @@ console.log(booking);
     );
   }
 
-  // Pass server data to the client component
   return <BookingClientView booking={booking} />;
 }

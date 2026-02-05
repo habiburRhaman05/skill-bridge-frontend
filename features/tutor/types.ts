@@ -1,3 +1,4 @@
+import { StringToBoolean } from "class-variance-authority/types";
 
 export type Category = {
   id: string;
@@ -61,7 +62,10 @@ export type StudentBooking = {
   status: "CONFIRMED" | "COMPLETED" | "CANCELLED";
   dateTime: string;      // ISO string
   createdAt: string;     // ISO string
-
+  student:{
+    name:string;
+    profileAvater:string
+  }
   availability: {
     date: string;        // ISO string
     startTime: string;   // "10:00"

@@ -35,7 +35,7 @@ export default async function TutorDashboard() {
 
   const stats = [
     { label: "Active Bookings", value: data?.upcomingSessions.length || 0, icon: Calendar, color: "text-indigo-600" },
-    { label: "Avg. Rating", value: data?.profile.avgRating || 0, icon: Star, color: "text-yellow-500" },
+    { label: "Avg. Rating", value: data?.profile.avgRating.toFixed(1) || 0, icon: Star, color: "text-yellow-500" },
     { label: "Total Reviews", value: data?.profile.totalReviews || 0, icon: Clock, color: "text-emerald-600" },
   ];
 

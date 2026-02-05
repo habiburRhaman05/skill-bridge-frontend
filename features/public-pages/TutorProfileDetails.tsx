@@ -348,7 +348,7 @@ const BookingModalContent = ({ tutor, selectedSlot, setDateTime, setSelectedSlot
       <div className="p-6 border-t bg-white space-y-4">
         <div className="flex justify-between items-center px-1">
           <span className="text-xs font-black text-zinc-400 uppercase tracking-widest">Fee per hour</span>
-          <span className="text-2xl font-black text-zinc-900">{tutor.hourlyRate} BDT</span>
+          <span className="text-2xl font-black text-zinc-900">{tutor.hourlyRate} USD</span>
         </div>
         <Button
           onClick={onConfirm}

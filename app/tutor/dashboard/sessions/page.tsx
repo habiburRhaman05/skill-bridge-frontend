@@ -6,6 +6,7 @@ import { StudentBooking } from "@/features/tutor/types";
 export default async function TutorSessionsPage() {
   const res = await getAllSession();
   const data: StudentBooking[] = res.data;
+console.log(data);
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-[#09090b] p-4 md:p-8">

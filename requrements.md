@@ -20,28 +20,28 @@
 
 ### 🔐 Authentication & Roles
 
-* [ ] **Role Selection:** Users must choose **Student** or **Tutor** during registration.
-* [ ] **Seeded Admin:** Admin account must exist in the database (not via registration).
-* [ ] **Protected Routes:** Students cannot access `/tutor/*` or `/admin/*`, and vice versa.
+* [ ] **Role Selection:** Users must choose **Student** or **Tutor** during registration.  ✔ 
+* [ ] **Seeded Admin:** Admin account must exist in the database (not via registration).✔ 
+* [ ] **Protected Routes:** Students cannot access `/tutor/*` or `/admin/*`, and vice versa.✔ 
 
 ### 👨‍🎓 Student Functionality
 
-* [ ] **Browse/Search:** Filter tutors by Category (Subjects), Rating, or Price.
-* [ ] **Tutor Profiles:** View details including reviews and specific availability slots.
-* [ ] **Booking System:** Ability to book a session instantly from a tutor's available slots.
-* [ ] **Review System:** Leave a rating/review after a session is marked "Completed."
+* [ ] **Browse/Search:** Filter tutors by Category (Subjects), Rating, or Price. ✔ 
+* [ ] **Tutor Profiles:** View details including reviews and specific availability slots. ✔ 
+* [ ] **Booking System:** Ability to book a session instantly from a tutor's available slots. ✔ 
+* [ ] **Review System:** Leave a rating/review after a session is marked "Completed." ✔ 
 
 ### 👨‍🏫 Tutor Functionality
 
-* [ ] **Profile Management:** Create and update a professional profile (Subjects, Bio, Price).
-* [ ] **Availability Management:** Set specific time slots for students to book.
-* [ ] **Session Tracking:** View upcoming sessions and mark them as "Completed."
+* [ ] **Profile Management:** Create and update a professional profile (Subjects, Bio, Price). ✔ 
+* [ ] **Availability Management:** Set specific time slots for students to book.✔ 
+* [ ] **Session Tracking:** View upcoming sessions and mark them as "Completed."✔ 
 
 ### ⚙️ Admin Functionality
 
-* [ ] **User Management:** A list of all users with the ability to Ban/Unban.
-* [ ] **Category Management:** Ability to Create, Update, or Delete tutor categories.
-* [ ] **Booking Oversight:** View every booking made on the platform.
+* [ ] **User Management:** A list of all users with the ability to Ban/Unban. ✔ 
+* [ ] **Category Management:** Ability to Create, Update, or Delete tutor categories.✔ 
+* [ ] **Booking Oversight:** View every booking made on the platform. ✔ 
 
 ---
 

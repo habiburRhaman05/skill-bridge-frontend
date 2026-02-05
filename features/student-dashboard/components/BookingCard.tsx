@@ -37,7 +37,7 @@ export const BookingCard = ({ booking }: { booking: any }) => {
     },
     onError: (e) => {
       toast.error("Failed to cancel booking")
-console.log("e",e);
+
 
     },
   });
@@ -153,7 +153,7 @@ console.log("e",e);
           <span className="text-[10px] text-zinc-400 dark:text-zinc-500 uppercase tracking-tighter font-bold">Hourly Rate</span>
           <div className="flex items-center gap-1.5 text-xs font-semibold text-zinc-700 dark:text-zinc-300">
             <DollarSign size={14} className="text-emerald-500" />
-            <span className="font-mono">৳{tutor.hourlyRate}</span>
+            <span className="font-mono">{tutor.hourlyRate}</span>
           </div>
         </div>
       </div>
