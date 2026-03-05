@@ -6,7 +6,7 @@ export async function POST(req: Request) {
 
     // Call backend API
     const backendRes = await fetch(
-      "https://skill-bridge-backend-production-f720.up.railway.app/api/auth/login",
+      "https://skill-bridge-backend-production-7e35.up.railway.app/api/auth/login",
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
