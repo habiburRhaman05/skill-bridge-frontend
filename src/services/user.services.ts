@@ -6,7 +6,7 @@ import { cookies } from "next/headers";
 export const getUserDashboardData = async () => {
   const cookieStore = await cookies()
 
-  const { data } = await httpRequest.get("/user/dashboard/kpis", {
+  const { data } = await httpRequest.get("/api/user/dashboard/kpis", {
     headers: {
       "cookie": cookieStore.toString()
     }
@@ -17,7 +17,7 @@ export const getUserDashboardData = async () => {
 
 export const handleClaimFreeCredit = async (payload) => {
     const cookieStore = await cookies()
-    const response = await httpRequest.post("/wallet/claim-free-credit", payload, {
+    const response = await httpRequest.post("/api/wallet/claim-free-credit", payload, {
       headers: {
         "cookie": cookieStore.toString(),
        timeout:30000

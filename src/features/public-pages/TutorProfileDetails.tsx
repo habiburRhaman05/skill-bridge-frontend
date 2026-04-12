@@ -48,17 +48,18 @@ export default function PublicTutorProfile({ data: initialData, student }: Tutor
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [dateTime, setDateTime] = useState<string | null>(null);
   const bookingMutation = useMutation({
-    mutationFn:createBooking,
-    onSuccess:(res)=>{
-  
-    
-        setBookingStep("SUCCESS")
-         toast.success( res.data.message || "Your Booking Created")
-      
-      
+    mutationFn: createBooking,
+    onSuccess: (res) => {
+      const checkoutUrl = res?.data?.checkoutUrl as string | undefined;
+      if (checkoutUrl) {
+        toast.success("Redirecting to secure checkout…");
+        window.location.assign(checkoutUrl);
+        return;
+      }
+      setBookingStep("SUCCESS");
+      toast.success(res?.data?.message || res?.message || "Booking created");
     },
-  
-  })
+  });
   useEffect(() => {
     if (initialData) {
       const timer = setTimeout(() => setIsLoading(false), 100);
@@ -81,18 +82,16 @@ export default function PublicTutorProfile({ data: initialData, student }: Tutor
 
 
     const payload = {
-      studentId: student.id,
       tutorId: tutor.id,
-      dateTime,
       availabilityId: selectedSlot,
-    }
-    await bookingMutation.mutateAsync(payload)
+    };
+    await bookingMutation.mutateAsync(payload);
 
   };
 
   // বুকিং বাটন রেন্ডার করার লজিক (Role based)
   const renderBookButton = (className?: string) => {
-    if (student.role !== "STUDENT") {
+    if (student.role !== "STUDENT" && student.role !== "USER") {
       return (
         <div className="space-y-2">
           <Button disabled className={cn("w-full opacity-50 cursor-not-allowed", className)}>

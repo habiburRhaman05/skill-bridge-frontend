@@ -18,3 +18,4 @@ export interface Booking {
   avatar: string;
   amount: string;
 }
+

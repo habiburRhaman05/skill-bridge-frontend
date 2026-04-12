@@ -8,3 +8,4 @@ export const getCookies = async (name:string)=>{
     const cookieStore =  await cookies();
     return cookieStore.get(name) || null
 }
+

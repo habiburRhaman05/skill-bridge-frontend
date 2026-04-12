@@ -6,7 +6,7 @@ const CTASection = () => (
     <div className="max-w-7xl mx-auto bg-indigo-600 rounded-[50px] p-12 text-center text-white relative overflow-hidden">
       <div className="relative z-10">
         <h2 className="text-4xl md:text-6xl font-black tracking-tighter mb-6">Ready to Master a New Skill?</h2>
-        <p className="text-indigo-100 text-xl mb-10 max-w-2xl mx-auto">Join SkillBridge today. Choose your role as a Student or Tutor and start your journey.</p>
+        <p className="text-indigo-100 text-xl mb-10 max-w-2xl mx-auto">Join Learnzilla today. Choose your role as a Student or Tutor and start your journey.</p>
         <div className="flex flex-col sm:flex-row justify-center gap-4">
           <Button size="lg" className="bg-white text-indigo-600 hover:bg-indigo-50 font-black rounded-2xl h-16 px-10 text-lg">
             Register as Student

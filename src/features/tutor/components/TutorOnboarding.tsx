@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/select";
 import { useMutation } from "@tanstack/react-query";
 import { tutorOnboardingHandler } from "../services";
+import { generateAIContent } from "@/services/ai.services";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
@@ -39,6 +40,7 @@ const onboardingSchema = z.object({
 
 const TutorOnboarding = () => {
   const router = useRouter();
+  const [isGeneratingBio, setIsGeneratingBio] = React.useState(false);
   const handleOnboarding = useMutation({
     mutationFn: tutorOnboardingHandler,
     onSuccess: () => {
@@ -76,6 +78,35 @@ const TutorOnboarding = () => {
       await handleOnboarding.mutateAsync(value);
     },
   });
+
+  const handleGenerateBio = async () => {
+    const vals = form.state.values;
+    if (!vals.category || vals.subjects.length === 0) {
+      toast.error("Please select a category and subjects first");
+      return;
+    }
+    setIsGeneratingBio(true);
+    try {
+      const res = await generateAIContent({
+        mode: "resume",
+        data: {
+          target_role: "Tutor specializing in " + vals.category,
+          skills: vals.subjects,
+          experience: vals.experience + " years of teaching experience",
+        },
+      });
+      if (res.success && res.data?.professional_summary) {
+        form.setFieldValue("bio", res.data.professional_summary);
+        toast.success("Bio generated successfully!");
+      } else {
+        toast.error("Failed to generate bio");
+      }
+    } catch (e) {
+      toast.error("An error occurred");
+    } finally {
+      setIsGeneratingBio(false);
+    }
+  };
 
   return (
     <AnimatePresence>
@@ -199,7 +230,19 @@ const TutorOnboarding = () => {
             <form.Field name="bio">
               {(field) => (
                 <div className="space-y-2">
-                  <Label className="text-[10px] font-black uppercase text-zinc-400 tracking-widest ml-1">Bio</Label>
+                  <div className="flex items-center justify-between ml-1">
+                    <Label className="text-[10px] font-black uppercase text-zinc-400 tracking-widest">Bio</Label>
+                    <Button 
+                      type="button" 
+                      variant="ghost" 
+                      onClick={handleGenerateBio}
+                      disabled={isGeneratingBio}
+                      className="h-6 px-3 py-1 text-[10px] font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-full dark:bg-indigo-500/10 dark:hover:bg-indigo-500/20 flex items-center"
+                    >
+                      {isGeneratingBio ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Sparkles className="w-3 h-3 mr-1" />}
+                      Generate with AI
+                    </Button>
+                  </div>
                   <Textarea 
                     value={field.state.value}
                     onChange={(e) => field.handleChange(e.target.value)}

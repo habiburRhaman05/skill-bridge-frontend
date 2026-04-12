@@ -29,15 +29,18 @@ export const deleteCookie = async (name : string) => {
     cookieStore.delete(name);
 }
 
-export const setAuthCookie = async (accessToken:string,sessionToken:string,refreshToken:string)=>{
-    "use server"
-      try {
-           await setTokenInCookies("accessToken", accessToken, 10 * 60);
-                await setTokenInCookies("better-auth.session_token", sessionToken, 10 * 60);
-                await setTokenInCookies("refreshToken", refreshToken, 30 * 60);
-                return true
-      } catch (error) {
-                return false
-        
-      }
-}
+export const setAuthCookie = async (
+  accessToken: string,
+  sessionToken: string,
+  refreshToken: string
+) => {
+  "use server";
+  try {
+    await setTokenInCookies("accessToken", accessToken, 60 * 60);
+    await setTokenInCookies("better-auth.session_token", sessionToken, 60 * 60);
+    await setTokenInCookies("refreshToken", refreshToken, 120 * 60);
+    return true;
+  } catch {
+    return false;
+  }
+};

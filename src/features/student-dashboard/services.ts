@@ -10,6 +10,24 @@ export async function getToken() {
   return cookieStore.toString();
 }
 
+export async function getSavedTutors(savedidxs: string[]) {
+  try {
+    const token = await getToken();
+    const res = await fetch(`${process.env.API_URL}/api/student/savedTutors`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        cookie: token,
+      },
+    });
+    const data = await res.json();
+    return { data };
+  } catch (error: any) { 
+    console.error("getSavedTutors error:", error);
+    return { error: error.message }
+  } 
+}
+
 export async function getDashboardStats(id:string) {
   try {
     const token = await getToken();

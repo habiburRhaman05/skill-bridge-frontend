@@ -3,103 +3,66 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-
-import { signInPayloadType, signUpPayloadType } from "@/features/auth/types";
+import { signUpPayloadType } from "@/features/auth/types";
 import { useApiMutation } from "@/hooks/useApiMutation";
-import { getProfile, logoutUser} from "./services";
-
+import { getProfile, logoutUser } from "./services";
 
 export const useAuthHandlers = () => {
   const router = useRouter();
-  const [status,setStatus] = useState("none")
-  const [userData,setUserData] = useState({})
-
-  
+  const [status, setStatus] = useState("none");
+  const [userData, setUserData] = useState<Record<string, unknown>>({});
 
   const signupMutation = useApiMutation({
-    endpoint:"/api/auth/register",
-    method:"POST",
-  })
-  const signinMutation = useApiMutation({
-    endpoint:"/api/auth/login",
-    method:"POST",
-  })
-  // --- Sign In ---
-  const signIn = async (data: signInPayloadType) => {
-    // const userData =  await signinMutation.mutateAsync(data);
-   const res = fetch(`/api/login`, {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify(data),
-  credentials: "include", // 🔥 REQUIRED
-});
+    endpoint: "auth/register",
+    method: "POST",
+    showSuccessToast: false,
+    showErrorToast: true,
+  });
 
-
-const userData = (await res).json().then(r=>{
-  return r
-});
-return userData
-
-
-
-  };
-
-  // --- Sign Up ---
   const signUp = async (data: signUpPayloadType) => {
- 
-  
-    await signupMutation.mutateAsync(data);
- 
-   
-   
+    try {
+      const res = await signupMutation.mutateAsync(data as unknown as never);
+      toast.success(
+        (res as { message?: string })?.message || "Account created — you can sign in now."
+      );
+      router.push("/sign-in");
+    } catch {
+      /* toast handled in hook */
+    }
   };
-  // --- Get user profile ---
+
   const getCurrentUser = async () => {
- 
-  setStatus("get-profile")
-   const userData = await getProfile();
-
-    
-
-   if(!userData){
-     setStatus("none")
-     setUserData({})
-   }
-   setUserData(userData?.user.data)
-   
+    setStatus("get-profile");
+    const profile = await getProfile();
+    if (!profile) {
+      setStatus("none");
+      setUserData({});
+      return;
+    }
+    setUserData((profile.user?.data as Record<string, unknown>) ?? {});
+    setStatus("none");
   };
 
-  // --- Get user profile ---
   const logoutCurrentUser = async () => {
- 
-  setStatus("logout-user")
-     const res  = await logoutUser();
-
-   
-  
-   
-   
+    setStatus("logout-user");
+    await logoutUser();
+    setStatus("none");
+    router.push("/sign-in");
+    router.refresh();
   };
 
-
-useEffect(()=>{
- getCurrentUser()
-},[])
-useEffect(()=>{
-    if(signupMutation.isSuccess){
-      router.push("/sign-in")
-     }
- 
-},[signupMutation.isSuccess])
+  useEffect(() => {
+    getCurrentUser();
+  }, []);
 
   return {
-    signIn,
     signUp,
-    isSigningIn: signinMutation.isPending,
     isSigningUp: signupMutation.isPending,
-getCurrentUser,
-logoutCurrentUser,
-userData,userLoading:status === "get-profile",
-logoutLoading:status === "logout-user"
+    getCurrentUser,
+    logoutCurrentUser,
+    userData,
+    userLoading: status === "get-profile",
+    logoutLoading: status === "logout-user",
   };
 };
+

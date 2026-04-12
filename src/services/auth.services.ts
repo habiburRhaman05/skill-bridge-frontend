@@ -7,20 +7,19 @@ import { cookies } from "next/headers";
 import { deleteCookie } from "@/lib/cookie";
 
 import { NextRequest } from "next/server";
-import { signInPayloadType } from "@/interfaces/auth.type";
+
 import { revalidatePath } from "next/cache";
 import { httpRequest } from "@/config/axios/axios";
+import { signInPayloadType } from "@/features/auth/types";
 
 
 export const getMe = async () => {
-      const cookieStore = await cookies()
- const res = await httpRequest.get("/auth/me",{
-  headers: {
-        "cookie": cookieStore.toString()
-      }
- });
- return res.data
-}
+  const cookieStore = await cookies();
+  const { data } = await httpRequest.get("/api/auth/me", {
+    headers: { cookie: cookieStore.toString() },
+  });
+  return res.data;
+};
 
 export const revalidateProfileData = async (path="/dashboard/profile") =>{
   console.log("re-start");
@@ -33,7 +32,7 @@ export const revalidateProfileData = async (path="/dashboard/profile") =>{
 
 export const handleLogin = async (loginPayload: signInPayloadType) => {
   try {
-    const res = await httpRequest.post("/auth/login", loginPayload);
+    const res = await httpRequest.post("/api/auth/login", loginPayload);
     console.log(res.data);
 
     const { accessToken, refreshToken, sessionToken, user, message } = res.data.data;
@@ -58,12 +57,10 @@ export const handleLogin = async (loginPayload: signInPayloadType) => {
 export const handleLogout = async () => {
   try {
     const cookieStore = await cookies()
-    const res = await httpRequest.get("/auth/logout", {
-      headers: {
-        "cookie": cookieStore.toString()
-      }
+    const res = await httpRequest.post("/api/auth/logout", undefined, {
+      headers: { cookie: cookieStore.toString() },
     });
-    if (res.data.success) {
+    if (res.data?.success !== false) {
       await deleteCookie("accessToken")
       await deleteCookie("refreshToken")
       await deleteCookie("better-auth.session_token")
@@ -91,9 +88,11 @@ let refreshPromise: Promise<any> | null = null;
 
 export async function refreshTokens(refreshToken: string, apiUrl: string) {
   if (!refreshPromise) {
-    refreshPromise = fetch(`${apiUrl}/auth/refresh-token`, {
-      method: 'POST',
+    const base = apiUrl.replace(/\/$/, "");
+    refreshPromise = fetch(`${base}/api/auth/refresh-token`, {
+      method: "POST",
       headers: { Cookie: `refreshToken=${refreshToken}` },
+      credentials: "include",
     })
       .then(async (res) => {
         if (!res.ok) throw new Error('Refresh failed');
@@ -122,7 +121,7 @@ export const changePassword = async (payload) => {
 
 
   try {
-    const res = await httpRequest.put("/auth/change-password", payload, {
+    const res = await httpRequest.put("/api/auth/change-password", payload, {
       headers: {
         "cookie": cookieStore.toString()
       }
@@ -154,7 +153,7 @@ export const handleAvatarUpload = async (formData: FormData) => {
   try {
     const cookieStore = await cookies();
     
-    const response = await httpRequest.post("/upload-media/upload-avatar", formData, {
+    const response = await httpRequest.post("/api/upload-media/upload-avatar", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
         "cookie": cookieStore.toString()
@@ -189,7 +188,7 @@ export const handleProfileUpdate = async (payload) => {
 
     const cookieStore = await cookies();
     
-    const response = await httpRequest.put("/auth/update-profile", payload, {
+    const response = await httpRequest.put("/api/auth/profile/update", payload, {
       headers: {
         "cookie": cookieStore.toString()
       },
@@ -201,7 +200,7 @@ export const handleProfileUpdate = async (payload) => {
 };
 export const handleEmailVerification = async ({ email, otp }) => {
   const cookieStore = await cookies()
-  const result = await httpRequest.post("/auth/verify-email", {
+  const result = await httpRequest.post("/api/auth/verify-email", {
     email,
     otp,
   }, {
@@ -221,7 +220,7 @@ export const handleChangeAvatar = async (uploadedUrl) =>{
  try {
      const cookieStore = await cookies();
 
- const {data} = await httpRequest.put("/auth/change-avatar", {"profileAvatar":uploadedUrl},{
+ const {data} = await httpRequest.put("/api/auth/profile/change-avater", {"profileAvatar":uploadedUrl},{
   headers:{
      "cookie": cookieStore.toString()
   }

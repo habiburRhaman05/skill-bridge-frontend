@@ -4,9 +4,9 @@ import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { addAvailabilityPayload, updateTutorProfilePayload } from "./types";
 
-/**
- * Helper to get all cookies as a string for the fetch header
- */
+const API_BASE =
+  process.env.API_URL ?? process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000";
+
 async function getCookieHeader() {
   const cookieStore = await cookies();
   return cookieStore.toString();
@@ -16,11 +16,11 @@ export const tutorOnboardingHandler = async (payload: unknown) => {
   try {
     const cookieString = await getCookieHeader();
 
-    const response = await fetch(`${process.env.API_URL}/api/tutor/profile`, {
+    const response = await fetch(`${API_BASE}/api/tutor/profile`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        cookie: cookieString, // Sending token via cookie header
+        cookie: cookieString,
       },
       body: JSON.stringify(payload),
     });
@@ -28,9 +28,9 @@ export const tutorOnboardingHandler = async (payload: unknown) => {
     const result = await response.json();
     if (!response.ok) throw new Error(result.message || "Failed to complete onboarding");
     return result;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("tutorOnboardingHandler error:", error);
-    return { error: error.message || "Something went wrong" };
+    return { error: error instanceof Error ? error.message : "Something went wrong" };
   }
 };
 
@@ -38,7 +38,7 @@ export async function updateTutorProfile(formData: updateTutorProfilePayload | u
   try {
     const cookieString = await getCookieHeader();
 
-    const res = await fetch(`${process.env.API_URL}/api/tutor/profile`, {
+    const res = await fetch(`${API_BASE}/api/tutor/profile`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -56,18 +56,17 @@ export async function updateTutorProfile(formData: updateTutorProfilePayload | u
   }
 }
 
-
-
 export const getAllSession = async () => {
   try {
     const cookieString = await getCookieHeader();
 
-    const response = await fetch(`${process.env.API_URL}/api/tutor/sessions`, {
+    const response = await fetch(`${API_BASE}/api/tutor/sessions`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
         cookie: cookieString,
       },
+      cache: "no-store",
     });
 
     const result = await response.json();
@@ -75,7 +74,7 @@ export const getAllSession = async () => {
     return result;
   } catch (error) {
     console.error("getAllSession error:", error);
-    return [];
+    return { data: [] };
   }
 };
 
@@ -83,7 +82,7 @@ export const addAvailability = async (payload: addAvailabilityPayload) => {
   try {
     const cookieString = await getCookieHeader();
 
-    const response = await fetch(`${process.env.API_URL}/api/tutor/availability`, {
+    const response = await fetch(`${API_BASE}/api/tutor/availability`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -105,25 +104,43 @@ export const getAllAvailability = async () => {
   try {
     const cookieString = await getCookieHeader();
 
-    const response = await fetch(`${process.env.API_URL}/api/tutor/availability`, {
+    const response = await fetch(`${API_BASE}/api/tutor/availability`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
         cookie: cookieString,
       },
+      cache: "no-store",
     });
 
-    return await response.json();
+    const json = await response.json();
+    return json?.data ?? json;
   } catch (error) {
     console.error("getAllAvailability error:", error);
     return [];
   }
 };
 
+export async function deleteAvailabilitySlot(slotId: string) {
+  try {
+    const cookieString = await getCookieHeader();
+    const res = await fetch(`${API_BASE}/api/tutor/availability/${slotId}`, {
+      method: "DELETE",
+      headers: { cookie: cookieString },
+    });
+    const result = await res.json();
+    revalidatePath("/tutor/dashboard/availability");
+    return result;
+  } catch (error) {
+    console.error("deleteAvailabilitySlot error:", error);
+    return { success: false, message: "Failed to delete slot" };
+  }
+}
+
 export async function getTutorReviews(tutorId: string) {
   try {
     const cookieString = await getCookieHeader();
-    const response = await fetch(`${process.env.API_URL}/api/review/${tutorId}`, {
+    const response = await fetch(`${API_BASE}/api/review/${tutorId}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -135,14 +152,14 @@ export async function getTutorReviews(tutorId: string) {
     return await response.json();
   } catch (error) {
     console.error("getTutorReviews error:", error);
-    return { success: false, message: "Server connection failed" };
+    return { success: false, message: "Server connection failed", data: [] };
   }
 }
 
 export async function getTutorDashboardData() {
   try {
     const cookieString = await getCookieHeader();
-    const response = await fetch(`${process.env.API_URL}/api/tutor/get-dashboard-data`, {
+    const response = await fetch(`${API_BASE}/api/tutor/get-dashboard-data`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -151,24 +168,50 @@ export async function getTutorDashboardData() {
       cache: "no-store",
     });
 
-    return await response.json();
+    const json = await response.json();
+    return json?.data ?? json;
   } catch (error) {
     console.error("getTutorDashboardData error:", error);
-    return { success: false, message: "Server connection failed" };
+    return null;
   }
 }
 
-export async function updateSessionStatus(payload: any) {
+export async function getTutorEarnings() {
   try {
     const cookieString = await getCookieHeader();
-    const response = await fetch(`${process.env.API_URL}/api/tutor/sessions/${payload.sessionId}/finish-session`, {
-      method: "PUT",
+    const response = await fetch(`${API_BASE}/api/tutor/earnings`, {
+      method: "GET",
       headers: {
         "Content-Type": "application/json",
         cookie: cookieString,
       },
-      body: JSON.stringify(payload.body),
+      cache: "no-store",
     });
+    const json = await response.json();
+    return json?.data ?? json;
+  } catch (error) {
+    console.error("getTutorEarnings error:", error);
+    return null;
+  }
+}
+
+export async function updateSessionStatus(payload: {
+  sessionId: string;
+  body: { status: string };
+}) {
+  try {
+    const cookieString = await getCookieHeader();
+    const response = await fetch(
+      `${API_BASE}/api/tutor/sessions/${payload.sessionId}/finish-session`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          cookie: cookieString,
+        },
+        body: JSON.stringify(payload.body),
+      }
+    );
 
     const result = await response.json();
     revalidatePath("/tutor/dashboard/sessions");
@@ -178,3 +221,4 @@ export async function updateSessionStatus(payload: any) {
     return { success: false, message: "Server connection failed" };
   }
 }
+

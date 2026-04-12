@@ -2,7 +2,7 @@
 
 import AppLoader from "@/components/global/AppLoader";
 import { IUser } from "@/interfaces/user";
-import { getMe } from "@/services/auth.services";
+import { getSession } from "@/lib/auth/session";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { createContext, useContext, useEffect, useState, SetStateAction, Dispatch } from "react";
@@ -32,7 +32,15 @@ export default function UserContextWrapper({ children }: { children: React.React
     
   } = useQuery({
     queryKey: [cacheKey],
-    queryFn: getMe,
+    queryFn: async () => {
+      const session = await getSession();
+      if (!session?.data) {
+        const err = new Error("UNAUTHORIZED") as Error & { status?: number };
+        err.status = 401;
+        throw err;
+      }
+      return session;
+    },
     retry: (failureCount, error: any) => {
       // Don't retry on 401
       if (error?.response?.status === 401) {
@@ -48,7 +56,7 @@ export default function UserContextWrapper({ children }: { children: React.React
   // Update user state when query data changes
   useEffect(() => {
     if (userData?.data) {
-      setUser(userData.data);
+      setUser(userData.data as IUser);
       console.log(userData.data);
     } else if (isError) {
       setUser(null);

@@ -1,44 +1,39 @@
-import { httpRequest } from "@/config/axios/axios";
-import { useRefetchQueries } from "@/lib/react-query";
-import axios from "axios";
+"use client";
+
+import { signOutAction } from "@/lib/auth/actions";
+import { useUser } from "@/context/UserContext";
 import { Loader, LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 
 const LogoutButton = () => {
   const [loading, setLoading] = useState(false);
- const {refetchQueries} = useRefetchQueries()
-  const router = useRouter()
-const handleLogout = async () => {
-  try {
-    setLoading(true)
-    // Call your internal Next.js API route
-    await axios.post("/api/logout");
-refetchQueries("user-profile")
+  const router = useRouter();
+  const { refetch } = useUser();
 
-    
-    // Refresh or redirect to home/login
-    window.location.href="/sign-in"
-    router.refresh(); 
-  } catch (error) {
-    console.error("Logout failed", error);
-    
-  }
-};
+  const handleLogout = async () => {
+    try {
+      setLoading(true);
+      const res = await signOutAction();
+      await refetch();
+      toast.success(res.message || "Signed out");
+      router.push("/sign-in");
+      router.refresh();
+    } catch {
+      toast.error("Could not sign out");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <button
-      onClick={handleLogout}
-      className="flex items-center w-full cursor-pointer h-full"
-    >
-      {loading ? (
-        <Loader className="animate-spin" />
-      ) : (
-        <LogOut className="mr-3 h-4 w-4" />
-      )}
-      <span className="font-bold ml-2">Logout</span>
+    <button type="button" onClick={handleLogout} className="flex h-full w-full cursor-pointer items-center">
+      {loading ? <Loader className="animate-spin" /> : <LogOut className="mr-3 h-4 w-4" />}
+      <span className="ml-2 font-bold">Logout</span>
     </button>
   );
 };
 
 export default LogoutButton;
+

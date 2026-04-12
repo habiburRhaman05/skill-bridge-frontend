@@ -8,7 +8,7 @@ import { cookies } from "next/headers";
 export const updateUserStatus = async (id: string, status: string) => {
     const cookieStore = await cookies()
 
-  const { data } = await httpRequest.patch(`/admin/users/${id}/status`, { status },{
+  const { data } = await httpRequest.patch(`/api/admin/users/${id}/status`, { status },{
      headers: {
         "cookie": cookieStore.toString()
       }
@@ -41,7 +41,7 @@ headers: {
 export const getAllTransactionns = async (page,limit)=>{
     const cookieStore = await cookies()
 
-  const {data} = await httpRequest.get(`/payment/get-all-transactions?page=${page}&limit=${limit}`,{
+  const {data} = await httpRequest.get(`/api/payment/get-all-transactions?page=${page}&limit=${limit}`,{
 headers: {
         "cookie": cookieStore.toString()
       }
@@ -88,4 +88,5 @@ headers: {
   })
   return data
 }
+
 

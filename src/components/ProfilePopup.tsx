@@ -84,3 +84,4 @@ export function ProfilePopup({ userName, userRole = "Student", avatarInitials }:
     </div>
   );
 }
+

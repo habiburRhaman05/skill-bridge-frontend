@@ -28,10 +28,10 @@ export const categories = [
 
 // ── Testimonials ──
 export const testimonials = [
-  { name: "Alex Johnson", role: "Computer Science Student", text: "SkillBridge connected me with an incredible Python tutor. My grades improved from B- to A+ in just two months!", rating: 5 },
+  { name: "Alex Johnson", role: "Computer Science Student", text: "Learnzilla connected me with an incredible Python tutor. My grades improved from B- to A+ in just two months!", rating: 5 },
   { name: "Maria Garcia", role: "High School Senior", text: "The SAT prep tutors here are phenomenal. I scored 1520 after working with my tutor for 3 months.", rating: 5 },
   { name: "David Kim", role: "MBA Candidate", text: "Found an amazing finance tutor who helped me understand complex derivatives. Worth every penny.", rating: 4 },
-  { name: "Sophie Laurent", role: "Music Student", text: "My piano tutor from SkillBridge prepared me for my conservatory audition. I got accepted!", rating: 5 },
+  { name: "Sophie Laurent", role: "Music Student", text: "My piano tutor from Learnzilla prepared me for my conservatory audition. I got accepted!", rating: 5 },
 ];
 
 export const stats = { tutors: 2500, students: 50000, sessions: 180000, satisfaction: 98 };
@@ -44,7 +44,7 @@ export const blogPosts = [
 ];
 
 export const faqs = [
-  { q: "How does SkillBridge work?", a: "SkillBridge connects students with expert tutors worldwide. Browse tutor profiles, book sessions at your convenience, and learn via our integrated video platform." },
+  { q: "How does Learnzilla work?", a: "Learnzilla connects students with expert tutors worldwide. Browse tutor profiles, book sessions at your convenience, and learn via our integrated video platform." },
   { q: "How are tutors vetted?", a: "Every tutor goes through a rigorous verification process including identity checks, credential verification, subject knowledge tests, and a demo teaching session." },
   { q: "What if I'm not satisfied with a session?", a: "We offer a 100% satisfaction guarantee. If you're not happy with your session, we'll provide a full refund or match you with another tutor at no cost." },
   { q: "Can I try a tutor before committing?", a: "Yes! Many tutors offer a free 15-minute introductory session so you can assess their teaching style before booking a full session." },
@@ -116,12 +116,12 @@ export const pieData = [
 
 // ── Bookings ──
 export const recentBookings = [
-  { id: "BK001", student: "Alex Johnson", studentId: "stu-1", tutor: "Dr. Sarah Chen", tutorId: "1", subject: "Calculus II", date: "Apr 10, 2026", time: "10:00 AM", duration: "1 hour", status: "confirmed" as const, amount: 65, meetingLink: "https://meet.skillbridge.com/abc123", notes: "Focus on integration techniques", attachments: [] },
+  { id: "BK001", student: "Alex Johnson", studentId: "stu-1", tutor: "Dr. Sarah Chen", tutorId: "1", subject: "Calculus II", date: "Apr 10, 2026", time: "10:00 AM", duration: "1 hour", status: "confirmed" as const, amount: 65, meetingLink: "https://meet.Learnzilla.com/abc123", notes: "Focus on integration techniques", attachments: [] },
   { id: "BK002", student: "Maria Garcia", studentId: "stu-2", tutor: "James Mitchell", tutorId: "2", subject: "Physics 101", date: "Apr 10, 2026", time: "2:00 PM", duration: "1 hour", status: "pending" as const, amount: 55, meetingLink: "", notes: "", attachments: [] },
-  { id: "BK003", student: "David Kim", studentId: "stu-3", tutor: "David Okafor", tutorId: "8", subject: "Business Strategy", date: "Apr 9, 2026", time: "3:00 PM", duration: "1.5 hours", status: "completed" as const, amount: 120, meetingLink: "https://meet.skillbridge.com/def456", notes: "Case study analysis", attachments: ["case-study.pdf"] },
-  { id: "BK004", student: "Sophie Laurent", studentId: "stu-4", tutor: "Lisa Park", tutorId: "7", subject: "Piano", date: "Apr 9, 2026", time: "4:00 PM", duration: "1 hour", status: "confirmed" as const, amount: 60, meetingLink: "https://meet.skillbridge.com/ghi789", notes: "Chopin Nocturne practice", attachments: [] },
+  { id: "BK003", student: "David Kim", studentId: "stu-3", tutor: "David Okafor", tutorId: "8", subject: "Business Strategy", date: "Apr 9, 2026", time: "3:00 PM", duration: "1.5 hours", status: "completed" as const, amount: 120, meetingLink: "https://meet.Learnzilla.com/def456", notes: "Case study analysis", attachments: ["case-study.pdf"] },
+  { id: "BK004", student: "Sophie Laurent", studentId: "stu-4", tutor: "Lisa Park", tutorId: "7", subject: "Piano", date: "Apr 9, 2026", time: "4:00 PM", duration: "1 hour", status: "confirmed" as const, amount: 60, meetingLink: "https://meet.Learnzilla.com/ghi789", notes: "Chopin Nocturne practice", attachments: [] },
   { id: "BK005", student: "Ryan O'Brien", studentId: "stu-5", tutor: "Priya Sharma", tutorId: "3", subject: "Data Structures", date: "Apr 8, 2026", time: "11:00 AM", duration: "1 hour", status: "cancelled" as const, amount: 75, meetingLink: "", notes: "Cancelled by student", attachments: [] },
-  { id: "BK006", student: "Alex Johnson", studentId: "stu-1", tutor: "Priya Sharma", tutorId: "3", subject: "Algorithms", date: "Apr 7, 2026", time: "9:00 AM", duration: "1 hour", status: "completed" as const, amount: 75, meetingLink: "https://meet.skillbridge.com/jkl012", notes: "Graph algorithms", attachments: ["graph-notes.pdf"] },
+  { id: "BK006", student: "Alex Johnson", studentId: "stu-1", tutor: "Priya Sharma", tutorId: "3", subject: "Algorithms", date: "Apr 7, 2026", time: "9:00 AM", duration: "1 hour", status: "completed" as const, amount: 75, meetingLink: "https://meet.Learnzilla.com/jkl012", notes: "Graph algorithms", attachments: ["graph-notes.pdf"] },
   { id: "BK007", student: "Maria Garcia", studentId: "stu-2", tutor: "Dr. Ahmed Hassan", tutorId: "6", subject: "Genetics", date: "Apr 6, 2026", time: "1:00 PM", duration: "1 hour", status: "completed" as const, amount: 70, meetingLink: "", notes: "DNA replication review", attachments: [] },
   { id: "BK008", student: "David Kim", studentId: "stu-3", tutor: "Emma Williams", tutorId: "5", subject: "Creative Writing", date: "Apr 5, 2026", time: "10:00 AM", duration: "1 hour", status: "completed" as const, amount: 45, meetingLink: "", notes: "Short story workshop", attachments: ["draft.docx"] },
 ];
@@ -170,7 +170,7 @@ export const issues = [
   { id: "ISS002", title: "Tutor didn't show up", username: "Maria Garcia", description: "Booked a physics session but the tutor was absent.", type: "ISSUE" as const, status: "PENDING" as const, location: "Session BK002", userMessage: "I need a refund for this session.", adminFeedback: null, imageUrl: null, createdAt: "Apr 10, 2026", priority: "critical" as const },
   { id: "ISS003", title: "Suggestion for mobile app", username: "David Kim", description: "It would be great to have a native mobile app.", type: "IMPROVEMENT" as const, status: "SUCCESS" as const, location: null, userMessage: "Please consider building a mobile app for easier access.", adminFeedback: "Thank you for the suggestion! We're working on it.", imageUrl: null, createdAt: "Apr 8, 2026", priority: "low" as const },
   { id: "ISS004", title: "Payment not reflected", username: "Sophie Laurent", description: "I paid for a piano session but it still shows pending.", type: "ISSUE" as const, status: "PENDING" as const, location: "Payment PAY003", userMessage: "My payment was deducted but status is still pending.", adminFeedback: null, imageUrl: null, createdAt: "Apr 9, 2026", priority: "high" as const },
-  { id: "ISS005", title: "Great experience feedback", username: "Ryan O'Brien", description: "Just wanted to share my positive experience with SkillBridge.", type: "FEEDBACK" as const, status: "SUCCESS" as const, location: null, userMessage: "Love the platform! The tutors are amazing.", adminFeedback: "Thank you Ryan! We appreciate your kind words.", imageUrl: null, createdAt: "Apr 7, 2026", priority: "low" as const },
+  { id: "ISS005", title: "Great experience feedback", username: "Ryan O'Brien", description: "Just wanted to share my positive experience with Learnzilla.", type: "FEEDBACK" as const, status: "SUCCESS" as const, location: null, userMessage: "Love the platform! The tutors are amazing.", adminFeedback: "Thank you Ryan! We appreciate your kind words.", imageUrl: null, createdAt: "Apr 7, 2026", priority: "low" as const },
 ];
 
 export const issueReplies = [
@@ -318,10 +318,11 @@ export const auditLogs = [
 
 // ── Platform Settings ──
 export const platformSettings = {
-  general: { platformName: "SkillBridge", tagline: "Learn from the best", supportEmail: "support@skillbridge.com", maintenanceMode: false },
+  general: { platformName: "Learnzilla", tagline: "Learn from the best", supportEmail: "support@Learnzilla.com", maintenanceMode: false },
   payment: { commissionRate: 15, minWithdrawal: 50, payoutSchedule: "weekly", enabledGateways: ["STRIPE", "PAYPAL", "SSLCOMMERZ"] },
   features: { chatEnabled: true, videoEnabled: true, blogEnabled: true, reviewsEnabled: true, notificationsEnabled: true },
 };
 
 // ── Saved Tutors ──
 export const savedTutors = ["1", "3", "6", "8"];
+

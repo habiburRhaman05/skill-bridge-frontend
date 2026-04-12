@@ -11,7 +11,7 @@ const LOADING_MESSAGES = [
   "Verifying identity...",
 ];
 
-export const SkillBridgeLoader = () => {
+export const LearnzillaLoader = () => {
   const [messageIndex, setMessageIndex] = useState(0);
 
   useEffect(() => {
@@ -89,7 +89,7 @@ export const SkillBridgeLoader = () => {
         {/* Textual Feedback */}
         <div className="mt-10 text-center h-12">
           <motion.h2 className="text-2xl font-black tracking-tighter text-zinc-900 dark:text-white">
-            SkillBridge
+            Learnzilla
           </motion.h2>
           <AnimatePresence mode="wait">
             <motion.p

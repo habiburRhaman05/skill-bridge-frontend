@@ -17,3 +17,4 @@ export function EmptyState({ icon: Icon = Inbox, title, description }: EmptyStat
     </div>
   );
 }
+

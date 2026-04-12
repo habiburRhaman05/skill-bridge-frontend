@@ -59,7 +59,7 @@ const {data,isLoading,isError} = useQuery({
               <Command className="h-5 w-5" />
             </div>
             <span className="text-lg font-bold tracking-tight">
-              SkillBridge
+              Learnzilla
             </span>
           </Link>
         </div>
@@ -131,7 +131,7 @@ const {data,isLoading,isError} = useQuery({
                 <SheetHeader className="text-left">
                   <SheetTitle className="flex items-center gap-2">
                     <Command className="h-5 w-5 text-indigo-600" />
-                    SkillBridge
+                    Learnzilla
                   </SheetTitle>
                 </SheetHeader>
                 <div className="mt-8 flex flex-col gap-4">

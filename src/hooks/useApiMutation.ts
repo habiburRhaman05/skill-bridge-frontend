@@ -1,55 +1,73 @@
-// hooks/use-api-mutation.ts
 import { httpRequest } from "@/config/axios/axios";
 import { useMutation, useQueryClient, UseMutationOptions } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { getErrorMessage } from "@/lib/http/parse";
 
 type MutationMethod = "POST" | "PUT" | "PATCH" | "DELETE";
 
 interface MutationConfig {
   method: MutationMethod;
+  /** Path after /api on the backend, e.g. `auth/register` or `student/profile` (no leading slash). */
   endpoint: string;
-  invalidateKeys?: string[];
+  invalidateKeys?: string[][];
   successMessage?: string;
+  /** If false, skip automatic success toast. */
+  showSuccessToast?: boolean;
+  /** If false, skip automatic error toast (handle in onError). */
+  showErrorToast?: boolean;
 }
 
-// এখানে TContext = unknown যোগ করা হয়েছে যা টাইপ এরর দূর করবে
-export function useApiMutation<TData = any, TVariables = any, TContext = unknown>(
+export function useApiMutation<TData = unknown, TVariables = unknown, TContext = unknown>(
   config: MutationConfig,
-  options?: UseMutationOptions<TData, Error, TVariables, TContext> | any
+  options?: UseMutationOptions<TData, Error, TVariables, TContext>
 ) {
   const queryClient = useQueryClient();
-  const { method, endpoint, invalidateKeys, successMessage } = config;
+  const {
+    method,
+    endpoint,
+    invalidateKeys,
+    successMessage,
+    showSuccessToast = true,
+    showErrorToast = true,
+  } = config;
 
   return useMutation<TData, Error, TVariables, TContext>({
     mutationFn: async (payload) => {
-       await new Promise((reslove)=> setTimeout(reslove,1000))
-
-      const response = await httpRequest({
-        url: endpoint,
+      const path = endpoint.replace(/^\//, "");
+      const response = await httpRequest.request<TData>({
+        url: path,
         method,
         data: payload,
       });
       return response.data;
     },
-    onSuccess: (data:any, variables, context) => {
-      toast.success(data.message || "Action completed successfully");
-
-      if (invalidateKeys) {
-        invalidateKeys.forEach((key) => {
-          queryClient.invalidateQueries({ queryKey:[key] });
-        });
+    onSuccess: (data: unknown, variables, context) => {
+      const msg =
+        successMessage ||
+        (data && typeof data === "object" && "message" in data && typeof (data as any).message === "string"
+          ? (data as any).message
+          : null);
+      if (showSuccessToast) {
+        toast.success(msg || "Done");
       }
+
+      invalidateKeys?.forEach((key) => {
+        queryClient.invalidateQueries({ queryKey: key });
+      });
 
       options?.onSuccess?.(data, variables, context);
     },
-    onError: (error: any, variables, context) => {
-      const message =error.response?.data?.error || error.response?.data?.message || "Something went wrong. Please try again.";
-      toast.error(message, {
-        description: "Error Code: " + (error.response?.status || "Unknown"),
-      });
-
-      options?.onError?.(error, variables, context);
+    onError: (error: unknown, variables, context) => {
+      if (showErrorToast) {
+        const ax = error as { response?: { data?: unknown; status?: number } };
+        const body = ax.response?.data;
+        toast.error(getErrorMessage(body, "Something went wrong"), {
+          description: ax.response?.status ? `HTTP ${ax.response.status}` : undefined,
+        });
+      }
+      options?.onError?.(error as Error, variables, context);
     },
     ...options,
   });
 }
+

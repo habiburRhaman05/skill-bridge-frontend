@@ -40,3 +40,4 @@ export function FilterBar({ searchValue, onSearchChange, searchPlaceholder = "Se
     </div>
   );
 }
+

@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { updateTutorProfile } from "../services";
+import { generateAIContent } from "@/services/ai.services";
 import { tutorProfileType } from "../types";
 import { useRefetchQueries } from "@/lib/react-query";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -49,6 +50,7 @@ export default function TutorProfilePage({ tutor }: { tutor: tutorProfileType })
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [localImagePreview, setLocalImagePreview] = useState<string | null>(null);
   const [profileAvater, setProfileAvater] = useState<string | null>(tutor.profileAvater);
+  const [isGeneratingBio, setIsGeneratingBio] = useState(false);
 
   // 2. Check if anything (text or image) has changed
   const isDirty = useMemo(() => {
@@ -105,6 +107,36 @@ export default function TutorProfilePage({ tutor }: { tutor: tutorProfileType })
         subjects: exists ? prev.subjects.filter((s) => s !== sub) : [...prev.subjects, sub],
       };
     });
+  };
+
+  const handleGenerateBio = async () => {
+    if (!draft.categoryId || draft.subjects.length === 0) {
+      toast.error("Please select a category and subjects first");
+      return;
+    }
+    const cat = categories.find(c => c.id === draft.categoryId);
+    setIsGeneratingBio(true);
+    try {
+      const res = await generateAIContent({
+        mode: "resume",
+        data: {
+          name: draft.name,
+          target_role: "Expert Tutor in " + (cat?.name || "General"),
+          skills: draft.subjects,
+          experience: draft.experience + " years of teaching",
+        },
+      });
+      if (res.success && res.data?.professional_summary) {
+        setDraft(prev => ({ ...prev, bio: res.data.professional_summary }));
+        toast.success("Bio generated beautifully!");
+      } else {
+        toast.error("Failed to generate bio");
+      }
+    } catch (e) {
+      toast.error("Network error");
+    } finally {
+      setIsGeneratingBio(false);
+    }
   };
 
 const confirmUpload = async () => {
@@ -313,7 +345,19 @@ const confirmUpload = async () => {
                   </section>
 
                   <section className="space-y-3">
-                    <Label className="text-[10px] font-black uppercase ml-2 text-zinc-400">Professional Bio</Label>
+                    <div className="flex items-center justify-between ml-2">
+                      <Label className="text-[10px] font-black uppercase text-zinc-400">Professional Bio</Label>
+                      <Button 
+                        type="button" 
+                        variant="ghost" 
+                        onClick={handleGenerateBio}
+                        disabled={isGeneratingBio}
+                        className="h-7 px-3 text-xs font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-full dark:bg-indigo-500/10 dark:hover:bg-indigo-500/20"
+                      >
+                        {isGeneratingBio ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Sparkles className="w-3 h-3 mr-1" />}
+                        Sparkle / Generate
+                      </Button>
+                    </div>
                     <Textarea
                       value={draft.bio}
                       onChange={e => setDraft({ ...draft, bio: e.target.value })}

@@ -18,7 +18,7 @@ const AI_RESPONSES = [
   "You can book a session by visiting any tutor's profile and selecting an available time slot. Payment is processed securely at the time of booking.",
   "Our tutors go through a rigorous verification process. We check credentials, conduct teaching demos, and monitor student reviews to ensure quality.",
   "If you need to cancel, you can do so up to 24 hours before the session for a full refund. Just go to your Dashboard > My Bookings.",
-  "Absolutely! SkillBridge offers tutoring in programming, mathematics, languages, music, design, business, and many more subjects. Browse our categories to explore!",
+  "Absolutely! Learnzilla offers tutoring in programming, mathematics, languages, music, design, business, and many more subjects. Browse our categories to explore!",
   "I'd suggest starting with a trial session — many tutors offer a discounted first meeting. This way you can find the perfect fit for your learning style.",
   "For the best results, I recommend having your goals clearly defined before each session. This helps your tutor prepare and deliver maximum value.",
 ];
@@ -29,7 +29,7 @@ export default function AIChatbot() {
     {
       id: 0,
       role: "assistant",
-      content: "Hi! I'm SkillBridge AI Assistant. How can I help you today? Ask me about tutors, bookings, subjects, or anything else!",
+      content: "Hi! I'm Learnzilla AI Assistant. How can I help you today? Ask me about tutors, bookings, subjects, or anything else!",
     },
   ]);
   const [input, setInput] = useState("");
@@ -82,7 +82,7 @@ export default function AIChatbot() {
                   <Bot className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <p className="text-white font-bold text-sm">SkillBridge AI</p>
+                  <p className="text-white font-bold text-sm">Learnzilla AI</p>
                   <p className="text-indigo-200 text-[10px] font-medium">Always here to help</p>
                 </div>
               </div>
@@ -173,3 +173,4 @@ export default function AIChatbot() {
     </div>
   );
 }
+

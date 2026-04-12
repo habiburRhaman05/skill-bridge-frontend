@@ -77,12 +77,13 @@ export const updateUserStatus = async (payload: { userId: string; body: { status
   }
 };
 
-export const getAllBookingsByAdmin = async () => {
+export const getAllBookingsByAdmin = async (page,status) => {
   try {
     const cookieString = await getToken();
     if (!cookieString) throw new Error("Unauthorized: No cookies found");
+console.log(`${API_URL}/api/admin/bookings?page=${page}&status=${status}`);
 
-    const res = await fetch(`${API_URL}/api/admin/bookings`, {
+    const res = await fetch(`${API_URL}/api/admin/bookings?page=${page}&status=${status}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -225,3 +226,4 @@ export const deleteCategoryByAdmin = async (id: string) => {
     throw error;
   }
 };
+

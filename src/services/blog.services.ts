@@ -6,7 +6,8 @@ import { cookies } from "next/headers";
 
 export const getAllBlogs = async (url:string) => {
     const cookieStore = await cookies()
-    const result = await httpRequest.get(url, {
+    const fullUrl = url.startsWith("/api") ? url : `/api${url.startsWith("/") ? "" : "/"}${url}`;
+    const result = await httpRequest.get(fullUrl, {
         headers: {
             "cookie": cookieStore.toString()
         }
@@ -17,7 +18,7 @@ export const getAllBlogs = async (url:string) => {
 }
 export const getBlogDetails = async (id) => {
     const cookieStore = await cookies()
-    const result = await httpRequest.get(`/blog/${id}`, {
+    const result = await httpRequest.get(`/api/blog/${id}`, {
         headers: {
             "cookie": cookieStore.toString()
         }
@@ -28,7 +29,7 @@ export const getBlogDetails = async (id) => {
 }
 export const createBlog = async (payload) => {
     const cookieStore = await cookies()
-    const result = await httpRequest.post("/blog", payload, {
+    const result = await httpRequest.post("/api/blog", payload, {
         headers: {
             "cookie": cookieStore.toString()
         }
@@ -40,12 +41,13 @@ export const createBlog = async (payload) => {
 
 export const deleteBlog = async (blogId) => {
     const cookieStore = await cookies()
-    const result = await httpRequest.delete(`/blog/${blogId}`, {
+    const result = await httpRequest.delete(`/api/blog/${blogId}`, {
         headers: {
             "cookie": cookieStore.toString()
         }
     });
     return result.data
 }
+
 
 

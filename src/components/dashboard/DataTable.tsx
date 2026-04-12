@@ -20,15 +20,31 @@ interface DataTableProps<T> {
   emptyTitle?: string;
   emptyDescription?: string;
   onRowClick?: (item: T) => void;
+  /** Shown under the table (e.g. range summary) */
+  resultsHint?: string;
+  /** Soft loading state while refetching (e.g. page change) */
+  isFetching?: boolean;
 }
 
-export function DataTable<T>({ columns, data, keyExtractor, page, totalPages, onPageChange, emptyTitle = "No data found", emptyDescription, onRowClick }: DataTableProps<T>) {
+export function DataTable<T>({
+  columns,
+  data,
+  keyExtractor,
+  page,
+  totalPages,
+  onPageChange,
+  emptyTitle = "No data found",
+  emptyDescription,
+  onRowClick,
+  resultsHint,
+  isFetching,
+}: DataTableProps<T>) {
   if (data.length === 0) {
     return <EmptyState title={emptyTitle} description={emptyDescription} />;
   }
 
   return (
-    <div>
+    <div className={isFetching ? "opacity-60 transition-opacity duration-200" : "transition-opacity duration-200"}>
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
@@ -57,19 +73,41 @@ export function DataTable<T>({ columns, data, keyExtractor, page, totalPages, on
           </tbody>
         </table>
       </div>
-      {page !== undefined && totalPages !== undefined && totalPages > 1 && onPageChange && (
-        <div className="flex items-center justify-center gap-2 mt-6">
-          <Button variant="outline" size="sm" disabled={page === 1} onClick={() => onPageChange(page - 1)} className="border-white/[0.08] rounded-xl">
-            <ChevronLeft className="w-4 h-4" />
-          </Button>
-          <span className="text-sm text-muted-foreground">
-            Page {page} of {totalPages}
-          </span>
-          <Button variant="outline" size="sm" disabled={page === totalPages} onClick={() => onPageChange(page + 1)} className="border-white/[0.08] rounded-xl">
-            <ChevronRight className="w-4 h-4" />
-          </Button>
+      {(resultsHint || (page !== undefined && totalPages !== undefined && totalPages > 1 && onPageChange)) && (
+        <div className="mt-6 flex flex-col gap-4 border-t border-border/50 pt-4 sm:flex-row sm:items-center sm:justify-between">
+          {resultsHint ? (
+            <p className="text-xs text-muted-foreground tabular-nums">{resultsHint}</p>
+          ) : (
+            <span />
+          )}
+          {page !== undefined && totalPages !== undefined && totalPages > 1 && onPageChange && (
+            <div className="flex items-center justify-center gap-2 sm:justify-end">
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={page === 1 || isFetching}
+                onClick={() => onPageChange(page - 1)}
+                className="border-white/[0.08] rounded-xl"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </Button>
+              <span className="min-w-[7rem] text-center text-sm text-muted-foreground tabular-nums">
+                Page {page} of {totalPages}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={page === totalPages || isFetching}
+                onClick={() => onPageChange(page + 1)}
+                className="border-white/[0.08] rounded-xl"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </Button>
+            </div>
+          )}
         </div>
       )}
     </div>
   );
 }
+

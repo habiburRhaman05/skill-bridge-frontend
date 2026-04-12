@@ -7,7 +7,7 @@
   <p align="center">
     <a href="https://skill-bridge-frontend-gamma.vercel.app" target="_blank"><strong>Live Demo</strong></a> ·
     <a href="https://github.com/habiburRhaman05/skill-bridge-backend" target="_blank"><strong>Backend Repo</strong></a> ·
-    <a href="https://drive.google.com/file/d/1IwMXJAI462PgOSXWQcfJltOKfADNWc2_/view" target="_blank"><strong>Demo Video</strong></a>
+    <a href="https://drive.google.com/file/d/18Yg5uUSScCjlSJJbN5UglHGvT7puB8Jz/view?usp=drivesdk" target="_blank"><strong>Demo Video</strong></a>
   </p>
 
   <p align="center">

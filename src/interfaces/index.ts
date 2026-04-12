@@ -253,3 +253,4 @@ export interface FilterState {
   category: string;
   sortBy: string;
 }
+
