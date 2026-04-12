@@ -1,38 +1,33 @@
+import { DashboardLayout } from '@/components/DashboardLayout';
 import Header from '@/components/layout/Header';
 import { DashboardSidebar } from '@/components/layout/SideBar';
 import { getProfile } from '@/features/auth/services';
 import TutorOnboarding from '@/features/tutor/components/TutorOnboarding';
+import { BookOpen, DollarSign, LayoutDashboard, Settings, Shield, Users } from 'lucide-react';
 import { redirect } from 'next/navigation';
 import React from 'react'
 
 const TutorDashbaordLayout = async({children}:{
     children:React.ReactNode
 }) => {
-   const userData = await getProfile()
+  //  const userData = await getProfile()
 
 
 
-   if(!userData){
-    redirect("/sign-in")
-   }
-   if(userData?.user.data.role !== "ADMIN"){
-    redirect("/")
-   }
+  //  if(!userData){
+  //   redirect("/sign-in")
+  //  }
+  //  if(userData?.user.data.role !== "ADMIN"){
+  //   redirect("/")
+  //  }
 
 
   return (
     <main className='w-full '>
       
-<Header/>
-    <div className=' w-full flex'>
-  <DashboardSidebar
-      userRole={userData?.user.data.role}
-      />
-
-        <div className=' w-full'>
-          { children }
-        </div>
-    </div>
+ <DashboardLayout title="Admin Dashboard" subtitle="Platform overview and management" userName="Admin User" userRole='ADMIN'>
+    {children}
+    </DashboardLayout>
     </main>
   )
 }

@@ -6,7 +6,7 @@ export async function POST(req: Request) {
 
     // Call backend API
     const backendRes = await fetch(
-      "https://skill-bridge-backend-production-f720.up.railway.app/api/auth/login",
+      "http:localhost:5000/api/auth/login",
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -26,6 +26,7 @@ export async function POST(req: Request) {
       res.headers.set("set-cookie", setCookie);
     }
   
+    console.log(res);
     
 
     return res;
